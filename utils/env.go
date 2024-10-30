@@ -9,6 +9,7 @@ import (
 
 const (
 	APP_FOLDER_ENV_NAME = "CM_APP_FOLDER"
+  APP_LOCATION_ENV_NAME = "CM_APP_LOCATION"
 )
 
 func getEnv(key string) (string, error) {
@@ -26,10 +27,6 @@ func ErrorPrinter(err error) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-}
-
-func GetAppLocation() (string, error) {
-	return getEnv(APP_FOLDER_ENV_NAME)
 }
 
 func PathExists(path string) bool {
@@ -64,7 +61,7 @@ func CreateFolder(path string) error {
 }
 
 func EnsureAppFolderExists() error {
-	appLocation, err := GetAppLocation()
+	appLocation, err := getEnv(APP_FOLDER_ENV_NAME)
 
 	if err != nil {
 		return err
