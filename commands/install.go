@@ -52,7 +52,13 @@ func checkConfigInstalled(configuration configuration) bool {
 	return utils.PathExists(fullpath)
 }
 
-func checkIsASymlink(configuration configuration) bool {
+func checkInstallSource(configuration configuration) (bool, error) {
+	appLocation, err := utils.GetEnv(utils.APP_LOCATION_ENV_NAME)
+
+	if err != nil {
+		return false, err
+	}
+
 	fullpath := configuration.ExpandPath()
 
 	info, err := os.Lstat(fullpath)
@@ -61,7 +67,23 @@ func checkIsASymlink(configuration configuration) bool {
 		panic(err)
 	}
 
-	return info.Mode()&fs.ModeSymlink != 0
+  isSymLink := info.Mode()&fs.ModeSymlink != 0
+
+  if !isSymLink {
+    return false, nil
+  }
+
+  link, err := os.Readlink(fullpath)
+	sourceLocation := path.Join(appLocation, "configs", configuration.name)
+
+  if err != nil {
+    return false, nil
+  }
+
+  fmt.Println(link)
+  fmt.Println(sourceLocation)
+
+  return link == sourceLocation, nil
 }
 
 func install(configuration configuration) error {
@@ -129,9 +151,13 @@ func Install() error {
 		exists := checkConfigInstalled(configuration)
 
 		if exists {
-			isSymLink := checkIsASymlink(configuration)
+			installationSource, err := checkInstallSource(configuration)
 
-			if isSymLink {
+      if err != nil {
+        return err
+      }
+
+			if installationSource {
 				fmt.Println("- already installed")
 			} else {
 				fmt.Println("! installed from a different source")
