@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/marcos-venicius/config-manager/utils"
 )
@@ -44,7 +45,7 @@ var configurations = []configuration{
 func checkConfigInstalled(configuration configuration) bool {
 	fmt.Printf("[%s] at [%s]\n", configuration.name, configuration.installAt)
 
-	fmt.Println("  - checking...")
+	fmt.Println("- checking...")
 
 	fullpath := configuration.ExpandPath()
 
@@ -64,7 +65,7 @@ func checkIsASymlink(configuration configuration) bool {
 }
 
 func install(configuration configuration) error {
-	fmt.Println("  - installing...")
+	fmt.Println("- installing...")
 
 	appLocation, err := utils.GetEnv(utils.APP_LOCATION_ENV_NAME)
 
@@ -85,11 +86,42 @@ func install(configuration configuration) error {
 		fmt.Printf(stderr)
 	}
 
-  if err == nil && len(stderr) == 0 {
-    fmt.Println("  - installed successfully")
-  }
+	if err == nil && len(stderr) == 0 {
+		fmt.Println("- installed successfully")
+	}
 
 	return err
+}
+
+func forceInstallation(configuration configuration) {
+	fmt.Println("- removing old installation")
+
+	fullpath := configuration.ExpandPath()
+
+	err := os.RemoveAll(fullpath)
+
+	if err != nil {
+		panic(err)
+	}
+
+	install(configuration)
+}
+
+func askForceInstallation(configuration configuration) {
+	var response string
+
+	fmt.Printf("do you want to force the installation? ")
+	fmt.Scan(&response)
+
+	response = strings.TrimSpace(strings.ToLower(response))
+
+	switch response {
+	case "y", "yes", "yep", "of course", "yeah", "yup", "sim", "s", "si", "oui":
+		forceInstallation(configuration)
+	default:
+		fmt.Println("- tool not installed")
+		break
+	}
 }
 
 func Install() error {
@@ -100,10 +132,10 @@ func Install() error {
 			isSymLink := checkIsASymlink(configuration)
 
 			if isSymLink {
-				fmt.Println("  - already installed")
+				fmt.Println("- already installed")
 			} else {
-				// TODO: ask to force installation
-				fmt.Println("  ! installed from a different source")
+				fmt.Println("! installed from a different source")
+				askForceInstallation(configuration)
 			}
 		} else {
 			err := install(configuration)
@@ -112,6 +144,8 @@ func Install() error {
 				return err
 			}
 		}
+
+		fmt.Println()
 	}
 
 	return nil

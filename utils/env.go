@@ -96,15 +96,15 @@ func Exec(command string) (string, string, error) {
 }
 
 func ParseHomePath(fullpath string) string {
-  if fullpath[0:2] == "~/" {
-    result, err := os.UserHomeDir()
+	if fullpath[0:2] == "~/" {
+		result, err := os.UserHomeDir()
 
-    if err != nil {
-      panic(err)
-    }
+		if err != nil {
+			panic(err)
+		}
 
-    return result + fullpath[1:]
-  }
+		return result + fullpath[1:]
+	}
 
-  return fullpath
+	return fullpath
 }
