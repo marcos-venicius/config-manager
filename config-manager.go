@@ -4,6 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	"github.com/marcos-venicius/config-manager/commands"
+	"github.com/marcos-venicius/config-manager/utils"
 )
 
 func main() {
@@ -23,6 +26,11 @@ func main() {
 
 	if *version {
 		fmt.Println(VERSION)
+		os.Exit(0)
+	}
+
+	if *update {
+		utils.ErrorPrinter(commands.Update())
 		os.Exit(0)
 	}
 }
