@@ -80,9 +80,6 @@ func checkInstallSource(configuration configuration) (bool, error) {
     return false, nil
   }
 
-  fmt.Println(link)
-  fmt.Println(sourceLocation)
-
   return link == sourceLocation, nil
 }
 
