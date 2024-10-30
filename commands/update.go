@@ -1,6 +1,10 @@
 package commands
 
-import "github.com/marcos-venicius/config-manager/utils"
+import (
+	"fmt"
+
+	"github.com/marcos-venicius/config-manager/utils"
+)
 
 func Update() error {
 	err := utils.EnsureAppFolderExists()
@@ -9,5 +13,15 @@ func Update() error {
 		return err
 	}
 
-  return nil
+	appLocation, err := utils.GetEnv(utils.APP_LOCATION_ENV_NAME)
+
+	stdout, stderr, err := utils.Exec(fmt.Sprintf("cd \"%s\" && git fetch && git fetch --prune && git pull", appLocation))
+
+	if err != nil {
+		fmt.Printf(stderr)
+	} else {
+		fmt.Printf(stdout)
+	}
+
+	return nil
 }

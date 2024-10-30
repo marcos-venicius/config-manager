@@ -1,18 +1,20 @@
 package utils
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 )
 
 const (
-	APP_FOLDER_ENV_NAME = "CM_APP_FOLDER"
-  APP_LOCATION_ENV_NAME = "CM_APP_LOCATION"
+	APP_FOLDER_ENV_NAME   = "CM_APP_FOLDER"
+	APP_LOCATION_ENV_NAME = "CM_APP_LOCATION"
 )
 
-func getEnv(key string) (string, error) {
+func GetEnv(key string) (string, error) {
 	result := os.Getenv(APP_FOLDER_ENV_NAME)
 
 	if result == "" {
@@ -41,12 +43,12 @@ func PathExists(path string) bool {
 func CreateFolder(path string) error {
 	split := strings.Split(path, "/")
 
-  for i := 0; i < len(split); i++ {
+	for i := 0; i < len(split); i++ {
 		path = strings.Join(split[:i+1], "/")
 
-    if path == "" {
-      continue
-    }
+		if path == "" {
+			continue
+		}
 
 		if !PathExists(path) {
 			err := os.Mkdir(path, 0777)
@@ -61,7 +63,7 @@ func CreateFolder(path string) error {
 }
 
 func EnsureAppFolderExists() error {
-	appLocation, err := getEnv(APP_FOLDER_ENV_NAME)
+	appLocation, err := GetEnv(APP_FOLDER_ENV_NAME)
 
 	if err != nil {
 		return err
@@ -76,4 +78,19 @@ func EnsureAppFolderExists() error {
 	}
 
 	return nil
+}
+
+// TODO: prevent against shell injection attacks
+func Exec(command string) (string, string, error) {
+	var stdout bytes.Buffer
+	var stderr bytes.Buffer
+
+	cmd := exec.Command("bash", "-c", command)
+
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	err := cmd.Run()
+
+	return stdout.String(), stderr.String(), err
 }
