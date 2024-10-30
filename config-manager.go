@@ -33,4 +33,9 @@ func main() {
 		utils.ErrorPrinter(commands.Update())
 		os.Exit(0)
 	}
+
+	if *install {
+		utils.ErrorPrinter(commands.Install())
+		os.Exit(0)
+	}
 }

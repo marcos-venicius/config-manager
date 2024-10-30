@@ -15,7 +15,7 @@ const (
 )
 
 func GetEnv(key string) (string, error) {
-	result := os.Getenv(APP_FOLDER_ENV_NAME)
+	result := os.Getenv(key)
 
 	if result == "" {
 		return "", errors.New(fmt.Sprintf("env var \"%s\" not found", key))
@@ -80,7 +80,7 @@ func EnsureAppFolderExists() error {
 	return nil
 }
 
-// TODO: prevent against shell injection attacks
+// TODO: prevent against shell injection attacks on env vars, create a sanitizer
 func Exec(command string) (string, string, error) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
@@ -93,4 +93,18 @@ func Exec(command string) (string, string, error) {
 	err := cmd.Run()
 
 	return stdout.String(), stderr.String(), err
+}
+
+func ParseHomePath(fullpath string) string {
+  if fullpath[0:2] == "~/" {
+    result, err := os.UserHomeDir()
+
+    if err != nil {
+      panic(err)
+    }
+
+    return result + fullpath[1:]
+  }
+
+  return fullpath
 }
