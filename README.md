@@ -16,6 +16,12 @@ Clone the repository:
 git clone https://github.com/marcos-venicius/config-manager ~/.config-manager
 ```
 
+Go to the folder:
+
+```bash
+cd ~/.config-manager
+```
+
 Install the binary:
 
 ```bash
