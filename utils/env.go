@@ -14,7 +14,7 @@ const (
 )
 
 var defaultEnv = map[string]string{
-  "APP_FOLDER_LOCATION": ParseHomePath("~/.config-manager/"),
+  "CM_APP_FOLDER_LOCATION": ParseHomePath("~/.config-manager/"),
 }
 
 func GetEnv(key string) (string, error) {
