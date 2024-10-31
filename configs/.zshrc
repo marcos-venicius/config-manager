@@ -126,7 +126,7 @@ export LD_LIBRARY_PATH=/usr/local/cuda-12.6/lib64${LD_LIBRARY_PATH:+:${LD_LIBRAR
 
 export PATH="/opt/launcher/bin/:$PATH"
 
-source /opt/zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 export CM_APP_LOCATION="$HOME/.config-manager"
 export CM_APP_FOLDER="$CM_APP_LOCATION/data"
