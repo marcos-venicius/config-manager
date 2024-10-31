@@ -7,13 +7,7 @@ import (
 )
 
 func Update() error {
-	err := utils.EnsureAppFolderExists()
-
-	if err != nil {
-		return err
-	}
-
-	appLocation, err := utils.GetEnv(utils.APP_LOCATION_ENV_NAME)
+	appLocation, err := utils.GetEnv(utils.APP_FOLDER_LOCATION)
 
 	stdout, stderr, err := utils.Exec(fmt.Sprintf("cd \"%s\" && git fetch && git fetch --prune && git pull && go install", appLocation))
 

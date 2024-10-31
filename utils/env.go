@@ -10,15 +10,22 @@ import (
 )
 
 const (
-	APP_FOLDER_ENV_NAME   = "CM_APP_FOLDER"
-	APP_LOCATION_ENV_NAME = "CM_APP_LOCATION"
+	APP_FOLDER_LOCATION = "CM_APP_FOLDER_LOCATION"
 )
+
+var defaultEnv = map[string]string{
+  "APP_FOLDER_LOCATION": ParseHomePath("~/.config-manager/"),
+}
 
 func GetEnv(key string) (string, error) {
 	result := os.Getenv(key)
 
 	if result == "" {
-		return "", errors.New(fmt.Sprintf("env var \"%s\" not found", key))
+    if result, ok := defaultEnv[key]; ok {
+      return result, nil
+    }
+
+    return "", errors.New(fmt.Sprintf("env var \"%s\" not found", key))
 	}
 
 	return result, nil
@@ -56,24 +63,6 @@ func CreateFolder(path string) error {
 			if err != nil {
 				return err
 			}
-		}
-	}
-
-	return nil
-}
-
-func EnsureAppFolderExists() error {
-	appLocation, err := GetEnv(APP_FOLDER_ENV_NAME)
-
-	if err != nil {
-		return err
-	}
-
-	if !PathExists(appLocation) {
-		err := CreateFolder(appLocation)
-
-		if err != nil {
-			return err
 		}
 	}
 

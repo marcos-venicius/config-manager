@@ -128,6 +128,3 @@ export PATH="/opt/launcher/bin/:$PATH"
 
 source $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
-export CM_APP_LOCATION="$HOME/.config-manager"
-export CM_APP_FOLDER="$CM_APP_LOCATION/data"
-

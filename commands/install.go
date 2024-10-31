@@ -53,7 +53,7 @@ func checkConfigInstalled(configuration configuration) bool {
 }
 
 func checkInstallSource(configuration configuration) (bool, error) {
-	appLocation, err := utils.GetEnv(utils.APP_LOCATION_ENV_NAME)
+	appLocation, err := utils.GetEnv(utils.APP_FOLDER_LOCATION)
 
 	if err != nil {
 		return false, err
@@ -86,7 +86,7 @@ func checkInstallSource(configuration configuration) (bool, error) {
 func install(configuration configuration) error {
 	fmt.Println("- installing...")
 
-	appLocation, err := utils.GetEnv(utils.APP_LOCATION_ENV_NAME)
+	appLocation, err := utils.GetEnv(utils.APP_FOLDER_LOCATION)
 
 	if err != nil {
 		return err
