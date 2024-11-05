@@ -41,7 +41,7 @@ local servers = {
   prismals = {},
   pylsp = {},
   tailwindcss = {},
-  ts_ls = {},
+  tsserver = {},
   bashls = {},
   rust_analyzer = {},
 
