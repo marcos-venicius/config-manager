@@ -1,10 +1,13 @@
 let mapleader=' '
 let maplocalleader=' '
 
+" remove GUI from GVim
+set guioptions=
 set autoread
 set fileformat=unix
 set expandtab
 set wildmenu
+set wildignore+=*node_modules*"
 set hlsearch
 set foldenable
 set foldmethod=manual
@@ -26,6 +29,7 @@ set incsearch
 set splitright
 set cursorline
 set nobackup
+set background=dark
 set nowritebackup
 set patchmode=off
 set backupcopy=no
@@ -33,7 +37,7 @@ set backupskip=*
 set backupdir=~/.vim/.backup/
 set clipboard+=unnamedplus
 
-colorscheme default
+colorscheme xcode
 
 filetype plugin indent on
 filetype plugin detect
