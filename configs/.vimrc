@@ -25,12 +25,14 @@ set splitbelow
 set incsearch
 set splitright
 set cursorline
-set nobackup
-set nowritebackup
-set patchmode=off
-set backupcopy=no
-set backupskip=*
-set backupdir=~/.vim/.backup/
+set noautochdir
+
+set backup
+set swapfile
+set directory=/tmp
+set dir=/tmp
+set backupdir=/tmp
+set backupdir=/tmp
 set clipboard+=unnamedplus
 
 colorscheme default
@@ -42,6 +44,12 @@ syntax on
 autocmd FileType csharp set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 autocmd FileType *.cs set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
 au BufRead,BufNewFile *.cs set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+
+autocmd FileType c set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+autocmd FileType *.c set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+au BufRead,BufNewFile *.c set tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+
+autocmd FileType make set tabstop=4 shiftwidth=4 softtabstop=4 noexpandtab
 
 autocmd FileType ruby set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 autocmd FileType *.rb set tabstop=2 shiftwidth=2 softtabstop=2 expandtab
@@ -66,9 +74,9 @@ hi! link netrwMarkFile Search
 highlight Comment ctermfg=green
 highlight String ctermfg=green
 
-let ghregex='\(^\|\s\s\)\zs\.\S\+'
+let ghregex='.*\.swp$,\~$,\.orig$'
 let g:netrw_list_hide=ghregex
-let g:netrw_liststyle = 3
+"let g:netrw_liststyle = 3
 
 function! FmtGo()
   :!/usr/local/go/bin/go fmt .
