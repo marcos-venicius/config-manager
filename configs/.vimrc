@@ -1,10 +1,13 @@
 let mapleader=' '
 let maplocalleader=' '
 
+" remove GUI from GVim
+set guioptions=
 set autoread
 set fileformat=unix
 set expandtab
 set wildmenu
+set wildignore+=*node_modules*"
 set hlsearch
 set foldenable
 set foldmethod=manual
@@ -35,7 +38,7 @@ set backupdir=/tmp
 set backupdir=/tmp
 set clipboard+=unnamedplus
 
-colorscheme default
+colorscheme xcode
 
 filetype plugin indent on
 filetype plugin detect
