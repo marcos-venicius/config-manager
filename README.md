@@ -1,5 +1,8 @@
 # Config manager
 
+> [!WARNING]
+> These are **my** personal configurations. Maybe it will not work on your environment.
+
 This is my tools config manager. It provides configuration for:
 
 - Tmux
@@ -7,6 +10,7 @@ This is my tools config manager. It provides configuration for:
 - Zsh (oh-my-zsh)
 - Vim
 - Neovim
+- Git config
 
 ## Installing
 

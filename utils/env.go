@@ -14,18 +14,18 @@ const (
 )
 
 var defaultEnv = map[string]string{
-  "CM_APP_FOLDER_LOCATION": ParseHomePath("~/.config-manager/"),
+	"CM_APP_FOLDER_LOCATION": ParseHomePath("~/.config-manager/"),
 }
 
 func GetEnv(key string) (string, error) {
 	result := os.Getenv(key)
 
 	if result == "" {
-    if result, ok := defaultEnv[key]; ok {
-      return result, nil
-    }
+		if result, ok := defaultEnv[key]; ok {
+			return result, nil
+		}
 
-    return "", errors.New(fmt.Sprintf("env var \"%s\" not found", key))
+		return "", errors.New(fmt.Sprintf("env var \"%s\" not found", key))
 	}
 
 	return result, nil

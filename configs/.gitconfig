@@ -1,0 +1,28 @@
+[user]
+  name = Marcos Venicius
+
+[core]
+	editor = nvim
+	excludesFile = ~/.gitignore
+
+[alias]
+  co = checkout
+  lg = log --graph --pretty=fuller --stat --notes --dirstat --abbrev-commit --decorate --all
+  c = commit
+  ac = !git add -A && git commit
+  st = status -sb
+  stl = status -sb .
+  tags = tag -l
+  p = push
+  branches = branch -a
+  remotes = remote -v
+  untrack = update-index --assume-unchanged
+  track = update-index --no-assume-unchanged
+
+[init]
+  defaultBranch = main
+
+[pull]
+	rebase = false
+[http]
+	version = HTTP/1.1

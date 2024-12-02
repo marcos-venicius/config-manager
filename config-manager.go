@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	const VERSION = "2.1.2"
+	const VERSION = "2.2.0"
 
 	update := flag.Bool("update", false, "update all settings")
 	install := flag.Bool("install", false, "install all settings")
@@ -18,24 +18,16 @@ func main() {
 
 	flag.Parse()
 
-	if !*update && !*install && !*version {
+	switch true {
+	case *version:
+		fmt.Println(VERSION)
+	case *update:
+		utils.ErrorPrinter(commands.Update())
+	case *install:
+		utils.ErrorPrinter(commands.Install())
+	default:
 		flag.Usage()
 		fmt.Printf("\nUse one of the options above\n")
 		os.Exit(1)
-	}
-
-	if *version {
-		fmt.Println(VERSION)
-		os.Exit(0)
-	}
-
-	if *update {
-		utils.ErrorPrinter(commands.Update())
-		os.Exit(0)
-	}
-
-	if *install {
-		utils.ErrorPrinter(commands.Install())
-		os.Exit(0)
 	}
 }

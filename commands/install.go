@@ -40,6 +40,10 @@ var configurations = []configuration{
 		name:      ".zshrc",
 		installAt: "~/",
 	},
+	{
+		name:      ".gitconfig",
+		installAt: "~/",
+	},
 }
 
 func checkConfigInstalled(configuration configuration) bool {
@@ -67,20 +71,20 @@ func checkInstallSource(configuration configuration) (bool, error) {
 		panic(err)
 	}
 
-  isSymLink := info.Mode()&fs.ModeSymlink != 0
+	isSymLink := info.Mode()&fs.ModeSymlink != 0
 
-  if !isSymLink {
-    return false, nil
-  }
+	if !isSymLink {
+		return false, nil
+	}
 
-  link, err := os.Readlink(fullpath)
+	link, err := os.Readlink(fullpath)
 	sourceLocation := path.Join(appLocation, "configs", configuration.name)
 
-  if err != nil {
-    return false, nil
-  }
+	if err != nil {
+		return false, nil
+	}
 
-  return link == sourceLocation, nil
+	return link == sourceLocation, nil
 }
 
 func install(configuration configuration) error {
@@ -150,9 +154,9 @@ func Install() error {
 		if exists {
 			installationSource, err := checkInstallSource(configuration)
 
-      if err != nil {
-        return err
-      }
+			if err != nil {
+				return err
+			}
 
 			if installationSource {
 				fmt.Println("- already installed")
