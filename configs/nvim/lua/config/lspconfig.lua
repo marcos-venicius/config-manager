@@ -35,15 +35,14 @@ require('mason-lspconfig').setup()
 
 local servers = {
   cssls = {},
-  emmet_language_server = {},
   gopls = {},
   html = {},
-  prismals = {},
   pylsp = {},
   tailwindcss = {},
-  tsserver = {},
+  ts_ls = {},
   bashls = {},
   rust_analyzer = {},
+  zls = {},
 
   lua_ls = {
     Lua = {

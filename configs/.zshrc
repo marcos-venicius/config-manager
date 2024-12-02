@@ -131,3 +131,4 @@ export PATH="/opt/launcher/bin/:$PATH"
 
 source $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
+export PATH="$PATH:/opt/neovim/bin"
