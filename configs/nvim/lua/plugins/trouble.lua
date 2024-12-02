@@ -8,11 +8,11 @@ return {
         "<cmd>Trouble custom_diagnostics toggle focus=true<cr>",
         desc = "Diagnostics (Trouble)",
       },
-      {
+      --[[ {
         "<leader>s",
         "<cmd>Trouble lsp_document_symbols toggle focus=true win.position=right<cr>",
         desc = "Symbols (Trouble)",
-      },
+      }, ]]
     },
     config = function()
       require('trouble').setup {

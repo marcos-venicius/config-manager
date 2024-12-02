@@ -28,3 +28,13 @@ vim.o.showmatch=true
 vim.opt.background='dark'
 vim.g.editorconfig = true
 vim.opt.fileformat = 'unix'
+
+vim.api.nvim_create_autocmd('BufRead', {
+  pattern = '*.c',
+  command = 'set tabstop=4 shiftwidth=4 softtabstop=4 expandtab'
+})
+
+vim.api.nvim_create_autocmd('BufNewFile', {
+  pattern = '*.c',
+  command = 'set tabstop=4 shiftwidth=4 softtabstop=4 expandtab'
+})
