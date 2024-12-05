@@ -1,5 +1,0 @@
-return {
-  {
-    'prettier/vim-prettier',
-  }
-}

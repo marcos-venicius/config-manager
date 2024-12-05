@@ -1,36 +1,10 @@
 return {
   {
-    'navarasu/onedark.nvim',
-    lazy = false,
+    'ellisonleao/gruvbox.nvim',
     priority = 1000,
+    lazy = false,
     config = function()
-      require('onedark').setup {
-        style = 'darker'
-      }
-      require('onedark').load()
+      vim.cmd("colorscheme gruvbox")
     end
-  },
-  {
-    "rose-pine/neovim",
-    as = "rose-pine",
-    lazy = false,
-    priority = 1000,
-  },
-  {
-    "folke/tokyonight.nvim",
-    lazy = false,
-    priority = 1000,
-    opts = {},
-  },
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    lazy = false,
-    priority = 1000
-  },
-  {
-    'morhetz/gruvbox',
-    priority = 1000,
-    lazy = false,
   }
 }

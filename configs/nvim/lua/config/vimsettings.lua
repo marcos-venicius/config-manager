@@ -1,3 +1,4 @@
+vim.opt.wildignore:append { "*.pyc", "node_modules/**", ".git/**" }
 vim.wo.signcolumn='yes'
 vim.o.expandtab=true
 vim.o.wildmenu=true
