@@ -4,9 +4,9 @@ startup_mode = "Maximized"
 
 decorations = "None"
 
-opacity = 1
+#opacity = 0.9
 
-padding = { x = 5, y = 5 }
+padding = { x = 0, y = 0 }
 
 dynamic_title = false
 
@@ -17,10 +17,9 @@ normal = { family = "JetBrainsMono Nerd Font" }
 size = 9
 
 [mouse]
-
 hide_when_typing = true
 
 [colors]
 [colors.primary]
-background = '#181818'
+background = '#262626'
 foreground = '#dcd7ba'

@@ -29,6 +29,10 @@ var configurations = []configuration{
 		installAt: "~/.config/",
 	},
 	{
+		name: "helix",
+		installAt: "~/.config/",
+	},
+	{
 		name:      ".tmux.conf",
 		installAt: "~/",
 	},

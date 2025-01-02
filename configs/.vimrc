@@ -38,8 +38,6 @@ set backupdir=/tmp
 set backupdir=/tmp
 set clipboard+=unnamedplus
 
-colorscheme xcode
-
 filetype plugin indent on
 filetype plugin detect
 syntax on
@@ -89,10 +87,6 @@ function! FmtAoc()
   let l:path=expand('%:p')
   silent execute '%!python3 /home/dev/projects/python/aoc/fmt.py ' . l:path
 endfunction
-
-
-au BufRead,BufNewFile *.go command Fmt :call FmtGo()
-au BufRead,BufNewFile *.coa nnoremap <leader>f :call FmtAoc()<CR>
 
 nnoremap - :Explore<CR>
 nnoremap <leader>r :source ~/.vimrc<CR>

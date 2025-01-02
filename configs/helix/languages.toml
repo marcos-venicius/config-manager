@@ -1,0 +1,67 @@
+# global lang servers
+[language-server]
+emmet-ls = { command = "emmet-ls", args = [ "--stdio" ] }
+
+# eslint lang server
+[language-server.eslint]
+args = ["--stdio"]
+command = "vscode-eslint-language-server"
+
+[language-server.eslint.config]
+validate = "on"
+experimental = { useFlatConfig = false }
+rulesCustomizations = []
+run = "onType"
+problems = { shortenToSingleLine = false }
+nodePath = ""
+
+[language-server.eslint.config.codeAction]
+[language-server.eslint.config.codeAction.disableRuleComment]
+enable = true
+location = "separateLine"
+
+[language-server.eslint.config.codeAction.showDocumentation]
+enable = true
+
+[language-server.eslint.config.codeActionOnSave]
+enable = true
+mode = "fixAll"
+
+[language-server.eslint.config.workingDirectory]
+mode = "auto"
+
+# typescript lang server
+[language-server.typescript-language-server]
+args = ["--stdio"]
+command = "typescript-language-server"
+
+[language-server.typescript-language-server.config]
+documentFormatting = false
+
+# languages
+[[language]]
+name = "typescript"
+scope = "source.ts"
+injection-regex = "(ts|typescript)"
+language-servers = [ { name = "typescript-language-server", except-features = [ "format" ] }, "eslint" ]
+roots = [ ".eslintrc.json", ".eslintrc",  "" ]
+file-types = ["ts"]
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+
+[[language]]
+name = "tsx"
+roots = [ ".eslintrc.json", ".eslintrc" ]
+language-servers = [ "vscode-eslint-laguage-server", "emmet-ls" ]
+formatter = { command = "prettier", args = ["--parser", "typescript"] }
+
+[[language]]
+name = "css"
+language-servers = [ "vscode-css-language-server" ]
+
+[[language]]
+name = "html"
+language-servers = [ "vscode-html-language-server" ]
+
+[[language]]
+name = "c"
+indent = { tab-width = 4, unit = "    " }

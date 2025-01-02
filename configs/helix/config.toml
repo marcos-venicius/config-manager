@@ -1,0 +1,18 @@
+theme = "vim_dark_high_contrast"
+
+[editor]
+bufferline = "always"
+line-number = "relative"
+cursorline = true
+default-line-ending = "lf"
+auto-format = false
+
+[editor.file-picker]
+hidden = false
+
+[editor.whitespace.render]
+tab = "all"
+space = "none"
+
+[keys.normal."space"]
+"o" = "file_picker_in_current_buffer_directory"
