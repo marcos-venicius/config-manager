@@ -1,5 +1,6 @@
 return {
   {
-    'tribela/transparent.nvim'
+    'tribela/transparent.nvim',
+    config = true
   }
 }

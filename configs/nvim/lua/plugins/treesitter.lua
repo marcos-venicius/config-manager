@@ -8,17 +8,21 @@ return {
         highlight = { enable = true },
         indent = { enable = true },
         incremental_selection = {
-          enable = false,
+          enable = true,
+          keymaps = {
+            node_incremental = "v",
+            node_decremental = "V"
+          }
         },
         textobjects = {
           move = {
             enable = true,
             set_jumps = true,
             goto_next_start = {
-              [']m'] = '@function.outer',
+              [']f'] = '@function.outer',
             },
             goto_previous_start = {
-              ['[m'] = '@function.outer',
+              ['[f'] = '@function.outer',
             },
           }
         }

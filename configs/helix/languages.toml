@@ -50,9 +50,12 @@ formatter = { command = "prettier", args = ["--parser", "typescript"] }
 
 [[language]]
 name = "tsx"
-roots = [ ".eslintrc.json", ".eslintrc" ]
-language-servers = [ "vscode-eslint-laguage-server", "emmet-ls" ]
+scope = "source.ts"
+injection-regex = "(tsx|typescriptreact)"
+roots = [ ".eslintrc.json", ".eslintrc" , "" ]
+language-servers = [ { name = "typescript-language-server", except-features = [ "format" ] }, "vscode-eslint-language-server" ]
 formatter = { command = "prettier", args = ["--parser", "typescript"] }
+file-types = ["tsx"]
 
 [[language]]
 name = "css"
@@ -65,3 +68,18 @@ language-servers = [ "vscode-html-language-server" ]
 [[language]]
 name = "c"
 indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "python"
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "go"
+auto-format = true
+language-servers = [ "gopls", "golangci-lint-lsp" ]
+
+[language-server.golangci-lint-lsp]
+command = "golangci-lint-langserver"
+
+[language-server.golangci-lint-lsp.config]
+command = ["golangci-lint", "run", "--out-format", "json", "--issues-exit-code=1"]

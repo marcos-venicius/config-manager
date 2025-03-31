@@ -1,4 +1,9 @@
-theme = "vim_dark_high_contrast"
+#theme = "penumbra+"
+#theme = "papercolor-dark"
+#theme = "onedarker"
+#theme = "onedark"
+theme = "jetbrains_dark"
+# theme = "everblush"
 
 [editor]
 bufferline = "always"
@@ -6,6 +11,9 @@ line-number = "relative"
 cursorline = true
 default-line-ending = "lf"
 auto-format = false
+
+[editor.cursor-shape]
+insert = "bar"
 
 [editor.file-picker]
 hidden = false
