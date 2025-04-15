@@ -4,7 +4,7 @@ startup_mode = "Maximized"
 
 decorations = "None"
 
-opacity = 0.9
+#opacity = 0.9
 
 padding = { x = 0, y = 0 }
 
@@ -21,10 +21,4 @@ hide_when_typing = true
 
 [colors]
 [colors.primary]
-# background = '#262626'
-background = '#18191c'
-# background = '#000000'
-#background = '#ffffff'
-# background = '#f6fad5'
-foreground = '#dcd7ba'
-# foreground = '#000000'
+background = '#000000'
