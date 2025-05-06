@@ -7,16 +7,12 @@ This is my tools config manager. It provides configuration for:
 
 - Tmux
 - Alacritty
-- Zsh (oh-my-zsh)
+- Helix
 - Vim
 - Neovim
 - Git config
 
 ## Installing
-
-**Requirements:**
-
-1. Have golang installed
 
 ```bash
 git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager && go install github.com/marcos-venicius/config-manager
