@@ -13,6 +13,8 @@ import (
 type configuration struct {
 	name      string
 	installAt string
+	// says if the configuration that will be installed is a folder of configs or just a file
+	isDir bool
 }
 
 func (c *configuration) ExpandPath() string {
@@ -23,30 +25,32 @@ var configurations = []configuration{
 	{
 		name:      "alacritty",
 		installAt: "~/.config/",
+		isDir:     true,
 	},
 	{
 		name:      "nvim",
 		installAt: "~/.config/",
+		isDir:     true,
 	},
 	{
-		name: "helix",
+		name:      "helix",
 		installAt: "~/.config/",
+		isDir:     true,
 	},
 	{
 		name:      ".tmux.conf",
 		installAt: "~/",
+		isDir:     false,
 	},
 	{
 		name:      ".vimrc",
 		installAt: "~/",
-	},
-	{
-		name:      ".zshrc",
-		installAt: "~/",
+		isDir:     false,
 	},
 	{
 		name:      ".gitconfig",
 		installAt: "~/",
+		isDir:     false,
 	},
 }
 
@@ -57,7 +61,7 @@ func checkConfigInstalled(configuration configuration) bool {
 
 	fullpath := configuration.ExpandPath()
 
-	return utils.PathExists(fullpath)
+	return utils.PathExists(fullpath, configuration.isDir)
 }
 
 func checkInstallSource(configuration configuration) (bool, error) {

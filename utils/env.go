@@ -38,26 +38,32 @@ func ErrorPrinter(err error) {
 	}
 }
 
-func PathExists(path string) bool {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+func PathExists(path string, isFolder bool) bool {
+	stat, err := os.Stat(path)
+
+  if os.IsNotExist(err) {
 		return false
 	}
 
-	return true
+  if isFolder {
+    return stat.IsDir()
+  }
+
+	return !stat.IsDir()
 }
 
 // CreateFolder creates a folder and ensure that the whole path exists, if not, it will be created
 func CreateFolder(path string) error {
 	split := strings.Split(path, "/")
 
-	for i := 0; i < len(split); i++ {
+	for i := range split {
 		path = strings.Join(split[:i+1], "/")
 
 		if path == "" {
 			continue
 		}
 
-		if !PathExists(path) {
+		if !PathExists(path, true) {
 			err := os.Mkdir(path, 0777)
 
 			if err != nil {
