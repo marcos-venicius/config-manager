@@ -41,13 +41,13 @@ func ErrorPrinter(err error) {
 func PathExists(path string, isFolder bool) bool {
 	stat, err := os.Stat(path)
 
-  if os.IsNotExist(err) {
+	if os.IsNotExist(err) {
 		return false
 	}
 
-  if isFolder {
-    return stat.IsDir()
-  }
+	if isFolder {
+		return stat.IsDir()
+	}
 
 	return !stat.IsDir()
 }
