@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	const VERSION = "2.2.1"
+	const VERSION = "2.3.0"
 
 	update := flag.Bool("update", false, "update all settings")
 	install := flag.Bool("install", false, "install all settings")
