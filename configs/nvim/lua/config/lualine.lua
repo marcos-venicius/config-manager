@@ -1,6 +1,6 @@
 require 'lualine'.setup {
   options = {
-    theme = 'auto',
+    theme = 'base16',
     icons_enabled = true,
     component_separators = {
       left = ' ',

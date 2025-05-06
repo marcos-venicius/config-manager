@@ -1,3 +1,4 @@
+require("config.theme")
 require("config.vimsettings")
 require("config.keymaps")
 require("config.lazy")
