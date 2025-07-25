@@ -1,6 +1,6 @@
 require 'lualine'.setup {
   options = {
-    theme = 'codedark',
+    theme = 'auto',
     icons_enabled = true,
     component_separators = {
       left = ' ',

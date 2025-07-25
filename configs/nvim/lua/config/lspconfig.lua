@@ -37,7 +37,18 @@ local servers = {
   cssls = {},
   gopls = {},
   html = {},
-  pylsp = {},
+  pylsp = {
+    settings = {
+      pylsp = {
+        plugins = {
+          pycodestyle = {
+            ignore = {'E501'},
+            maxLineLength = 200
+          },
+        }
+      }
+    }
+  },
   tailwindcss = {},
   ts_ls = {},
   bashls = {},

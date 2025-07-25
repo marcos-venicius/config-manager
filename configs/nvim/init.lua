@@ -1,7 +1,7 @@
-require("config.theme")
 require("config.vimsettings")
 require("config.keymaps")
 require("config.lazy")
+require("config.theme")
 
 vim.filetype.add({
   extension = {
