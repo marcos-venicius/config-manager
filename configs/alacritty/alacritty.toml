@@ -4,7 +4,7 @@ startup_mode = "Maximized"
 
 decorations = "None"
 
-opacity = 0.95
+#opacity = 0.95
 
 padding = { x = 0, y = 0 }
 
@@ -19,7 +19,11 @@ size = 9
 [mouse]
 hide_when_typing = true
 
-[colors]
-[colors.primary]
-background = '#000000'
-foreground = '#E6EFFF'
+#[colors]
+#[colors.primary]
+#background = '#000000'
+#foreground = '#E6EFFF'
+[general]
+import = [
+  "/home/dev/.config/alacritty/alacritty-theme/themes/aura.toml"
+]
