@@ -1,5 +1,6 @@
 let mapleader=' '
 let maplocalleader=' '
+let g:ctrlp_working_path_mode = 'r'
 
 " remove GUI from GVim
 set guioptions=
@@ -29,7 +30,7 @@ set hidden
 set splitbelow
 set incsearch
 set splitright
-set cursorline
+set nocursorline
 set noautochdir
 
 set backup
