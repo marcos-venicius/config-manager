@@ -4,4 +4,4 @@
 --[[ vim.cmd("colorscheme default") ]]
 --[[ vim.cmd("colorscheme aura") ]]
 --[[ vim.cmd("colorscheme retrobox") ]]
-vim.cmd("colorscheme monet")
+--[[ vim.cmd("colorscheme monet") ]]

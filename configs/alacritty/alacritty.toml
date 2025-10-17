@@ -1,29 +1,37 @@
 [window]
-
 startup_mode = "Maximized"
-
 decorations = "None"
-
-#opacity = 0.95
-
-padding = { x = 0, y = 0 }
-
+padding = { x = 2, y = 0 }
 dynamic_title = false
 
 [font]
-
 normal = { family = "JetBrainsMono Nerd Font" }
-
 size = 9
 
 [mouse]
 hide_when_typing = true
 
-#[colors]
-#[colors.primary]
-#background = '#000000'
-#foreground = '#E6EFFF'
-[general]
-import = [
-  "/home/dev/.config/alacritty/alacritty-theme/themes/aura.toml"
-]
+[colors.primary]
+background = "#272e33"
+foreground = "#d3c6aa"
+
+[colors.normal]
+black   = "#414b50"
+red     = "#e67e80"
+green   = "#a7c080"
+yellow  = "#dbbc7f"
+blue    = "#7fbbb3"
+magenta = "#d699b6"
+cyan    = "#83c092"
+white   = "#d3c6aa"
+
+[colors.bright]
+black   = "#475258"
+red     = "#e67e80"
+green   = "#a7c080"
+yellow  = "#dbbc7f"
+blue    = "#7fbbb3"
+magenta = "#d699b6"
+cyan    = "#83c092"
+white   = "#d3c6aa"
+
