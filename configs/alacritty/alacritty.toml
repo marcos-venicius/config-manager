@@ -12,7 +12,8 @@ size = 9
 hide_when_typing = true
 
 [colors.primary]
-background = "#272e33"
+#background = "#272e33"
+background = "#000000"
 foreground = "#d3c6aa"
 
 [colors.normal]

@@ -1,1 +1,1 @@
-vim.g.transparent_enabled = false
+vim.g.transparent_enabled = true
