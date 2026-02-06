@@ -20,3 +20,10 @@ git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manage
 
 If you want to put the repository in a different location, you can just add a new env var called `CM_APP_FOLDER_LOCATION` with the path to the custom location.
 
+### Manual configs
+
+Make the OS show only apps in current workspace when pressing <kbd>ALT + TAB</kbd>
+
+```bash
+gsettings set org.gnome.shell.app-switcher current-workspace-only true
+```
