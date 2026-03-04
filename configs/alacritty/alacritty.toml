@@ -1,8 +1,9 @@
 [window]
-startup_mode = "Maximized"
-decorations = "None"
+# startup_mode = "Maximized"
+# decorations = "None"
 padding = { x = 2, y = 0 }
 dynamic_title = false
+title = "Vim BTW"
 
 [font]
 normal = { family = "JetBrainsMono Nerd Font" }
