@@ -1,7 +1,7 @@
 local opt = vim.opt
 
 opt.wildignore:append { "*.pyc", "node_modules/**", ".git/**" }
-opt.signcolumn = "yes"
+opt.signcolumn = "no"
 opt.expandtab = true
 opt.wildmenu = true
 opt.hlsearch = true
@@ -41,10 +41,5 @@ vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
     vim.opt_local.expandtab = true
   end,
 })
-
-vim.api.nvim_cmd({
-	cmd = 'colorscheme',
-	args = { 'default' }
-}, {})
 
 vim.keymap.set('n', '<space><space>', ':nohlsearch<cr>')
