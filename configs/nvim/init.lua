@@ -1,3 +1,4 @@
+require('config.wodo')
 require('config.vimsettings')
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
