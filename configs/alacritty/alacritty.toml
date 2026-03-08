@@ -14,7 +14,7 @@ hide_when_typing = true
 
 [colors.primary]
 #background = "#272e33"
-background = "#000000"
+background = "#3b3b3b"
 foreground = "#d3c6aa"
 
 [colors.normal]

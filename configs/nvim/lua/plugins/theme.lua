@@ -1,10 +1,10 @@
 return {
   {
-    'wesgibbs/vim-irblack',
+    'rainstf/zenburn-m',
     config = function()
       vim.api.nvim_cmd({
         cmd = 'colorscheme',
-        args = { 'ir_black' }
+        args = { 'zenburn-m' }
       }, {})
     end
   }
