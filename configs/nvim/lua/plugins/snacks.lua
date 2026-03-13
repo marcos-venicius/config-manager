@@ -18,7 +18,7 @@ return {
     },
     indent = { enabled = false },
     input = { enabled = true },
-    notifier = { enabled = true, timeout = 3000 },
+    notifier = { enabled = true, timeout = 3000, width = { min = 0.5, max = 0.6 } },
     picker = {
       enabled = false,
     },
