@@ -22,5 +22,5 @@
   "telescope-fzf-native.nvim": { "branch": "main", "commit": "6fea601bd2b694c6f2ae08a6c6fab14930c60e2c" },
   "telescope.nvim": { "branch": "0.1.x", "commit": "a0bbec21143c7bc5f8bb02e0005fa0b982edc026" },
   "vim-visual-multi": { "branch": "master", "commit": "a6975e7c1ee157615bbc80fc25e4392f71c344d4" },
-  "zenburn-m": { "branch": "master", "commit": "814289c0dbfaded9f178394cdf123c685d3570c7" }
+  "zenburned": { "branch": "master", "commit": "38be6b4504d0def29ef5403856dc336780af27d8" }
 }

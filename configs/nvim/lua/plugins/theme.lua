@@ -1,10 +1,10 @@
 return {
   {
-    'rainstf/zenburn-m',
+    'marcos-venicius/zenburned',
     config = function()
       vim.api.nvim_cmd({
         cmd = 'colorscheme',
-        args = { 'zenburn-m' }
+        args = { 'zenburned' }
       }, {})
     end
   }

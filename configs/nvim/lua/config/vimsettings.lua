@@ -1,5 +1,7 @@
 local opt = vim.opt
 
+vim.o.path = vim.o.path .. ",**"
+
 opt.wildignore:append { "*.pyc", "node_modules/**", ".git/**" }
 opt.signcolumn = "no"
 opt.expandtab = true
