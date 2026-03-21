@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -77,23 +76,11 @@ func CreateFolder(path string) error {
 }
 
 // TODO: prevent against shell injection attacks on env vars, create a sanitizer
-func Exec(command string) (string, string, error) {
-	var stdout bytes.Buffer
-	var stderr bytes.Buffer
-
+func SysExec(homedir string, command string, loggingPadding string) int {
 	cmd := exec.Command("bash", "-c", command)
 
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	err := cmd.Run()
-
-	return stdout.String(), stderr.String(), err
-}
-
-// TODO: prevent against shell injection attacks on env vars, create a sanitizer
-func SysExec(command string, loggingPadding string) int {
-	cmd := exec.Command("bash", "-c", command)
+	env := cmd.Environ()
+	cmd.Env = append(env, fmt.Sprintf("HOME='%s'", homedir))
 
 	stdout, err := cmd.StdoutPipe()
 
@@ -139,8 +126,11 @@ func SysExec(command string, loggingPadding string) int {
 }
 
 // TODO: prevent against shell injection attacks on env vars, create a sanitizer
-func SimpleExec(command string) int {
+func SimpleExec(homedir, command string) int {
 	cmd := exec.Command("bash", "-c", command)
+
+	env := cmd.Environ()
+	cmd.Env = append(env, fmt.Sprintf("HOME='%s'", homedir))
 
 	cmd.Run()
 

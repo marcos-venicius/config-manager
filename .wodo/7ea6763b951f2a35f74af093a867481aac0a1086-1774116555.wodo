@@ -1,6 +1,6 @@
 % Run health checks before commands
 
-.state todo
+.state done
 .date 2026-03-21 15:14:32-03:00
 .tags mid_priority
 
