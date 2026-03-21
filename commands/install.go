@@ -8,8 +8,8 @@ import (
 )
 
 type step_t struct {
-	label string
-	commands []string
+	label               string
+	commands            []string
 	healthCheckCommands []string
 }
 
@@ -155,16 +155,16 @@ var installationSteps = []step_t{
 }
 
 func Install() error {
-	for stepIndex, step := range(installationSteps) {
+	for stepIndex, step := range installationSteps {
 		if stepIndex > 0 {
 			fmt.Println()
 		}
 
-		fmt.Printf("\033[0;34mStep %02d: %s\033[0m\n", stepIndex + 1, step.label)
+		fmt.Printf("\033[0;34mStep %02d: %s\033[0m\n", stepIndex+1, step.label)
 
 		// TODO: check healthCheckCommands before, so we can skip in case all of them succeed
-		for _, cmd := range(step.commands) {
-			fmt.Printf("  \033[0;33m$\033[0m %s\n", cmd);
+		for _, cmd := range step.commands {
+			fmt.Printf("  \033[0;33m$\033[0m %s\n", cmd)
 
 			exitCode := utils.SysExec(cmd, "    ")
 
@@ -188,8 +188,8 @@ func Install() error {
 		if len(step.healthCheckCommands) > 0 {
 			fmt.Printf("\033[0;36m  Health checking...\033[0m\n")
 
-			for j, healthCmd := range(step.healthCheckCommands) {
-				fmt.Printf("    Checking %02d: %s...", j + 1, healthCmd)
+			for j, healthCmd := range step.healthCheckCommands {
+				fmt.Printf("    Checking %02d: %s...", j+1, healthCmd)
 
 				exitCode := utils.SimpleExec(healthCmd)
 

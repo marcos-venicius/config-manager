@@ -38,7 +38,7 @@ Maybe creating the folders and linking the files.
 
 % Do not use default go flags tool
 
-.state todo
+.state done
 .date 2026-03-21 15:10:31-03:00
 .tags low_priority
 
