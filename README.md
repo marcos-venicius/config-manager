@@ -27,3 +27,13 @@ Make the OS show only apps in current workspace when pressing <kbd>ALT + TAB</kb
 ```bash
 gsettings set org.gnome.shell.app-switcher current-workspace-only true
 ```
+
+## Tools
+
+- Make, build-essentials
+- Alacritty
+- Tmux
+- Neovim
+- Bash
+- Git
+- Wodo (later)

@@ -1,12 +1,9 @@
 [window]
-# startup_mode = "Maximized"
-# decorations = "None"
 padding = { x = 0, y = 0 }
 dynamic_title = false
 title = "Vim BTW"
 
 [font]
-# normal = { family = "JetBrainsMono Nerd Font" }
 normal = { family = "Liberation Mono" }
 size = 9
 
@@ -14,8 +11,6 @@ size = 9
 hide_when_typing = true
 
 [colors.primary]
-#background = "#272e33"
-#background = "#3b3b3b"
 background = "#141414"
 foreground = "#d3c6aa"
 

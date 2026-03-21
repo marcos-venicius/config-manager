@@ -2,7 +2,7 @@
   name = Marcos Venicius
 
 [core]
-	editor = nvim
+	editor = vi
 	excludesFile = ~/.gitignore
 
 [alias]
