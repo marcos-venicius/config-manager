@@ -28,7 +28,9 @@ Make the OS show only apps in current workspace when pressing <kbd>ALT + TAB</kb
 gsettings set org.gnome.shell.app-switcher current-workspace-only true
 ```
 
-## Tools
+## (WIP) Tools
+
+![](./images/config-manager-install.png)
 
 - Make, build-essentials
 - Alacritty
