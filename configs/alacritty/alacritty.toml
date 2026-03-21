@@ -6,7 +6,8 @@ dynamic_title = false
 title = "Vim BTW"
 
 [font]
-normal = { family = "JetBrainsMono Nerd Font" }
+# normal = { family = "JetBrainsMono Nerd Font" }
+normal = { family = "Liberation Mono" }
 size = 9
 
 [mouse]
