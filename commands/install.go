@@ -9,6 +9,7 @@ import (
 
 type step_t struct {
 	label               string
+	asHome              bool // do not run commands as sudo
 	commands            []string
 	healthCheckCommands []string
 }
@@ -90,7 +91,8 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Cargo",
+		label:  "Cargo",
+		asHome: true,
 		commands: []string{
 			"curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > /tmp/rustc.sh",
 			"chmod u+x /tmp/rustc.sh",
@@ -148,7 +150,8 @@ var installationSteps = []step_t{
 	},
 	// alacritty installation is too slow, keep it at the end
 	{
-		label: "Alacritty",
+		label:  "Alacritty",
+		asHome: true,
 		commands: []string{
 			"$HOME/.cargo/bin/cargo install alacritty",
 		},
@@ -194,7 +197,7 @@ func Install() {
 			}
 
 			fmt.Println()
-			fmt.Printf("  \033[0;36mSkipping step %02d (%s). already installed...\033[0m\n", stepIndex, step.label)
+			fmt.Printf("  \033[0;36mSkipping step %02d (%s). already installed...\033[0m\n", stepIndex+1, step.label)
 			continue
 		}
 
@@ -206,7 +209,13 @@ func Install() {
 
 			fmt.Printf("  \033[0;33m$\033[0m %s\n", cmd)
 
-			exitCode := baseCmd.RunAsSudo(cmd, stdoutStderrPrinter("    "), stdoutStderrPrinter("    "))
+			exitCode := 0
+
+			if step.asHome {
+				exitCode = baseCmd.RunAsHome(cmd, stdoutStderrPrinter("    "), stdoutStderrPrinter("    "))
+			} else {
+				exitCode = baseCmd.RunAsSudo(cmd, stdoutStderrPrinter("    "), stdoutStderrPrinter("    "))
+			}
 
 			if exitCode == 0 {
 				fmt.Println("    \033[0;32mok\033[0m")
@@ -215,7 +224,7 @@ func Install() {
 
 				if len(step.healthCheckCommands) > 0 {
 					fmt.Println()
-					fmt.Printf("\n\ninstallation pipeline faild: step %02d (%s) failed with exit code %d for '%s'\n\n", stepIndex, step.label, exitCode, cmd)
+					fmt.Printf("\n\ninstallation pipeline faild: step %02d (%s) failed with exit code %d for '%s'\n\n", stepIndex+1, step.label, exitCode, cmd)
 					os.Exit(1)
 				} else {
 					fmt.Println("  ignoring...")
@@ -234,11 +243,11 @@ func Install() {
 				exitCode := baseCmd.RunAsHome(healthCmd, nil, nil)
 
 				if exitCode == 0 {
-					fmt.Println(" \033[1;32mok\033[0m")
+					fmt.Println("      \033[1;32mok\033[0m")
 				} else {
-					fmt.Printf(" \033[1;31mfail: %d\033[0m\n", exitCode)
+					fmt.Printf("      \033[1;31mfail: %d\033[0m\n", exitCode)
 
-					fmt.Printf("\n\ninstallation pipeline faild during helth check: step %02d (%s) failed with exit code %d while health checking '%s'\n\n", stepIndex, step.label, exitCode, healthCmd)
+					fmt.Printf("\n\ninstallation pipeline faild during helth check: step %02d (%s) failed with exit code %d while health checking '%s'\n\n", stepIndex+1, step.label, exitCode, healthCmd)
 					os.Exit(1)
 				}
 			}
