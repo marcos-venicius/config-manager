@@ -212,7 +212,6 @@ var installationSteps = []step_t{
 		label: "Neovim",
 		commands: []string{
 			"mkdir -p /tmp/neovim-installation",
-			// TODO: Do I need to install wget?
 			"wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz -O /tmp/neovim-installation/file.tar.gz",
 			// TODO: Do I need to install tar?
 			"tar -xvf /tmp/neovim-installation/file.tar.gz -C /tmp/neovim-installation/",
@@ -225,6 +224,20 @@ var installationSteps = []step_t{
 		},
 		healthCheckCommands: []string{
 			"vi --version",
+		},
+	},
+	{
+		label:  "Dotnet",
+		asHome: true,
+		commands: []string{
+			"mkdir -p $HOME/tools/dotnet",
+			"wget https://dot.net/v1/dotnet-install.sh -O $HOME/tools/dotnet/dotnet-install.sh",
+			"chmod u+x $HOME/tools/dotnet/dotnet-install.sh",
+			// Installing version 9.0
+			"$HOME/tools/dotnet/dotnet-install.sh --channel 9.0",
+		},
+		healthCheckCommands: []string{
+			"$HOME/.dotnet/dotnet --list-sdks | grep -qPo '9\\d*\\.\\d+\\.\\d+'",
 		},
 	},
 	{
