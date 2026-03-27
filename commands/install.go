@@ -241,6 +241,18 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		label: "GO Lang",
+		commands: []string{
+			"mkdir /tmp/golang-installation",
+			"wget https://go.dev/dl/go1.26.1.linux-amd64.tar.gz -O /tmp/golang-installation/go1.26.1.linux-amd64.tar.gz",
+			"rm -rf /opt/go && tar -C /opt -xzf /tmp/golang-installation/go1.26.1.linux-amd64.tar.gz",
+			"rm -rf /tmp/golang-installation",
+		},
+		healthCheckCommands: []string{
+			"/opt/go/bin/go version",
+		},
+	},
+	{
 		label: "Gnome configs",
 		commands: []string{
 			"gsettings set org.gnome.shell.app-switcher current-workspace-only true",
