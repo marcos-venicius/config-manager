@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// bake it during build with commit and date
-	const VERSION = "2.3.1"
+	const VERSION = "3.0.0"
 
 	args := CreateArgumentsParser().Parse()
 
