@@ -253,6 +253,15 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		label: "Nim",
+		commands: []string{
+			"curl https://nim-lang.org/choosenim/init.sh -sSf | sh",
+		},
+		healthCheckCommands: []string{
+			"$HOME/.nimble/bin/nim --version",
+		},
+	},
+	{
 		label: "Gnome configs",
 		commands: []string{
 			"gsettings set org.gnome.shell.app-switcher current-workspace-only true",
