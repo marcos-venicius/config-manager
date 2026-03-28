@@ -250,6 +250,17 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		label:  "Fetch and Build Helix grammar",
+		asHome: true,
+		commands: []string{
+			"hx --grammar fetch",
+			"hx --grammar build",
+		},
+		healthCheckCommands: []string{
+			"find $HOME/.config/helix/runtime/grammars -type f -name '*.so' 2>/dev/null | grep -qoP '.*.so'",
+		},
+	},
+	{
 		label:  "Dotnet",
 		asHome: true,
 		commands: []string{
