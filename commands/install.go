@@ -227,6 +227,29 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		label:  "Download & Build Helix",
+		asHome: true,
+		commands: []string{
+			"mkdir -p $HOME/.config/helix",
+			"mkdir -p $HOME/tools",
+			"git clone --depth 1 https://github.com/helix-editor/helix.git $HOME/tools/helix",
+			"cd $HOME/tools/helix && $HOME/.cargo/bin/cargo build --release",
+		},
+		healthCheckCommands: []string{
+			"$HOME/tools/helix/target/release/hx --version",
+		},
+	},
+	{
+		label: "Install Helix",
+		commands: []string{
+			"ln -s $HOME/tools/helix/target/release/hx /usr/local/bin/hx",
+			"ln -Tsf $HOME/tools/helix/runtime $HOME/.config/helix/runtime",
+		},
+		healthCheckCommands: []string{
+			"hx --version",
+		},
+	},
+	{
 		label:  "Dotnet",
 		asHome: true,
 		commands: []string{
