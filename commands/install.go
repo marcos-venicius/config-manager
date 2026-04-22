@@ -10,6 +10,7 @@ import (
 type step_t struct {
 	label               string
 	asHome              bool // do not run commands as sudo
+	disabled 					  bool
 	commands            []string
 	healthCheckCommands []string
 }
@@ -20,6 +21,12 @@ func Install() {
 	for stepIndex, step := range installationSteps {
 		if stepIndex > 0 {
 			fmt.Println()
+		}
+
+		if step.disabled {
+			fmt.Printf("\033[0;34mStep %02d \033[2;36m(disabled)\033[0;34m: %s\033[0m\n", stepIndex+1, step.label)
+			fmt.Printf("  \033[2;36mSkipping...\033[0m\n")
+			continue
 		}
 
 		fmt.Printf("\033[0;34mStep %02d: %s\033[0m\n", stepIndex+1, step.label)
@@ -229,6 +236,7 @@ var installationSteps = []step_t{
 	{
 		label:  "Download & Build Helix",
 		asHome: true,
+		disabled: true,
 		commands: []string{
 			"mkdir -p $HOME/.config/helix",
 			"mkdir -p $HOME/tools",
@@ -241,22 +249,15 @@ var installationSteps = []step_t{
 	},
 	{
 		label: "Install Helix",
+		disabled: true,
 		commands: []string{
 			"ln -s $HOME/tools/helix/target/release/hx /usr/local/bin/hx",
 			"ln -Tsf $HOME/tools/helix/runtime $HOME/.config/helix/runtime",
-		},
-		healthCheckCommands: []string{
-			"hx --version",
-		},
-	},
-	{
-		label:  "Fetch and Build Helix grammar",
-		asHome: true,
-		commands: []string{
 			"hx --grammar fetch",
 			"hx --grammar build",
 		},
 		healthCheckCommands: []string{
+			"hx --version",
 			"find $HOME/.config/helix/runtime/grammars -type f -name '*.so' 2>/dev/null | grep -qoP '.*.so'",
 		},
 	},
