@@ -1,3 +1,4 @@
+require('config.vimpack')
 require('vim._core.ui2').enable() -- not stable yet
 require('config.vimsettings')
 
