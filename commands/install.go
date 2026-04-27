@@ -10,7 +10,7 @@ import (
 type step_t struct {
 	label               string
 	asHome              bool // do not run commands as sudo
-	disabled 					  bool
+	disabled            bool
 	commands            []string
 	healthCheckCommands []string
 }

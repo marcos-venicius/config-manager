@@ -113,12 +113,12 @@ var installationSteps = []step_t{
 			"rm -rf /tmp/neovim-installation",
 		},
 		healthCheckCommands: []string{
-			"vi --version",
+			"/opt/nvim/bin/vi --version",
 		},
 	},
 	{
-		label:  "Download & Build Helix",
-		asHome: true,
+		label:    "Download & Build Helix",
+		asHome:   true,
 		disabled: true,
 		commands: []string{
 			"mkdir -p $HOME/.config/helix",
@@ -131,7 +131,7 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Install Helix",
+		label:    "Install Helix",
 		disabled: true,
 		commands: []string{
 			"ln -s $HOME/tools/helix/target/release/hx /usr/local/bin/hx",
