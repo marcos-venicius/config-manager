@@ -1,0 +1,4 @@
+theme = "gruber-darker"
+
+[editor]
+gutters = ["diagnostics", "spacer", "diff"]

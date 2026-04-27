@@ -2,186 +2,117 @@ package commands
 
 import (
 	"fmt"
-	"io/fs"
 	"os"
-	"path"
-	"strings"
 
-	"github.com/marcos-venicius/config-manager/utils"
+	"github.com/marcos-venicius/config-manager/sys"
 )
 
-type configuration struct {
-	name      string
-	installAt string
-	// says if the configuration that will be installed is a folder of configs or just a file
-	isDir bool
+type step_t struct {
+	label               string
+	asHome              bool // do not run commands as sudo
+	disabled            bool
+	commands            []string
+	healthCheckCommands []string
 }
 
-func (c *configuration) ExpandPath() string {
-	return utils.ParseHomePath(path.Join(c.installAt, c.name))
-}
+func Install() {
+	baseCmd := sys.Command()
 
-var configurations = []configuration{
-	{
-		name:      "alacritty",
-		installAt: "~/.config/",
-		isDir:     true,
-	},
-	{
-		name:      "nvim",
-		installAt: "~/.config/",
-		isDir:     true,
-	},
-	{
-		name:      "helix",
-		installAt: "~/.config/",
-		isDir:     true,
-	},
-	{
-		name:      ".tmux.conf",
-		installAt: "~/",
-		isDir:     false,
-	},
-	{
-		name:      ".vimrc",
-		installAt: "~/",
-		isDir:     false,
-	},
-	{
-		name:      ".gitconfig",
-		installAt: "~/",
-		isDir:     false,
-	},
-}
+	for stepIndex, step := range installationSteps {
+		if stepIndex > 0 {
+			fmt.Println()
+		}
 
-func checkConfigInstalled(configuration configuration) bool {
-	fmt.Printf("[%s] at [%s]\n", configuration.name, configuration.installAt)
+		if step.disabled {
+			fmt.Printf("\033[0;34mStep %02d \033[2;36m(disabled)\033[0;34m: %s\033[0m\n", stepIndex+1, step.label)
+			fmt.Printf("  \033[2;36mSkipping...\033[0m\n")
+			continue
+		}
 
-	fmt.Println("- checking...")
+		fmt.Printf("\033[0;34mStep %02d: %s\033[0m\n", stepIndex+1, step.label)
 
-	fullpath := configuration.ExpandPath()
+		if len(step.healthCheckCommands) > 0 {
+			for _, healthCmd := range step.healthCheckCommands {
+				exitCode := baseCmd.RunAsHome(healthCmd, nil, nil)
 
-	return utils.PathExists(fullpath, configuration.isDir)
-}
-
-func checkInstallSource(configuration configuration) (bool, error) {
-	appLocation, err := utils.GetEnv(utils.APP_FOLDER_LOCATION)
-
-	if err != nil {
-		return false, err
-	}
-
-	fullpath := configuration.ExpandPath()
-
-	info, err := os.Lstat(fullpath)
-
-	if err != nil {
-		panic(err)
-	}
-
-	isSymLink := info.Mode()&fs.ModeSymlink != 0
-
-	if !isSymLink {
-		return false, nil
-	}
-
-	link, err := os.Readlink(fullpath)
-	sourceLocation := path.Join(appLocation, "configs", configuration.name)
-
-	if err != nil {
-		return false, nil
-	}
-
-	return link == sourceLocation, nil
-}
-
-func install(configuration configuration) error {
-	fmt.Println("- installing...")
-
-	appLocation, err := utils.GetEnv(utils.APP_FOLDER_LOCATION)
-
-	if err != nil {
-		return err
-	}
-
-	fullpath := configuration.ExpandPath()
-	sourceLocation := path.Join(appLocation, "configs", configuration.name)
-
-	stdout, stderr, err := utils.Exec(fmt.Sprintf("ln -s \"%s\" \"%s\"", sourceLocation, fullpath))
-
-	if len(stdout) > 0 {
-		fmt.Printf(stdout)
-	}
-
-	if len(stderr) > 0 {
-		fmt.Printf(stderr)
-	}
-
-	if err == nil && len(stderr) == 0 {
-		fmt.Println("- installed successfully")
-	}
-
-	return err
-}
-
-func forceInstallation(configuration configuration) {
-	fmt.Println("- removing old installation")
-
-	fullpath := configuration.ExpandPath()
-
-	err := os.RemoveAll(fullpath)
-
-	if err != nil {
-		panic(err)
-	}
-
-	install(configuration)
-}
-
-func askForceInstallation(configuration configuration) {
-	var response string
-
-	fmt.Printf("do you want to force the installation? ")
-	fmt.Scan(&response)
-
-	response = strings.TrimSpace(strings.ToLower(response))
-
-	switch response {
-	case "y", "yes", "yep", "of course", "yeah", "yup", "sim", "s", "si", "oui":
-		forceInstallation(configuration)
-	default:
-		fmt.Println("- tool not installed")
-		break
-	}
-}
-
-func Install() error {
-	for _, configuration := range configurations {
-		exists := checkConfigInstalled(configuration)
-
-		if exists {
-			installationSource, err := checkInstallSource(configuration)
-
-			if err != nil {
-				return err
+				if exitCode != 0 {
+					goto install_step_tools
+				}
 			}
 
-			if installationSource {
-				fmt.Println("- already installed")
+			fmt.Println()
+			fmt.Printf("  \033[0;36mHealth checks:\033[0m\n\n")
+
+			for _, healthCmd := range step.healthCheckCommands {
+				fmt.Printf("    \033[0;33m$\033[0m %s\n", healthCmd)
+				fmt.Printf("      \033[1;32mok\033[0m\n")
+			}
+
+			fmt.Println()
+			fmt.Printf("  \033[0;36mSkipping step %02d (%s). already installed...\033[0m\n", stepIndex+1, step.label)
+			continue
+		}
+
+	install_step_tools:
+		for i, cmd := range step.commands {
+			if i > 0 {
+				fmt.Println()
+			}
+
+			fmt.Printf("  \033[0;33m$\033[0m %s\n", cmd)
+
+			exitCode := 0
+
+			if step.asHome {
+				exitCode = baseCmd.RunAsHome(cmd, stdoutStderrPrinter("    "), stdoutStderrPrinter("    "))
 			} else {
-				fmt.Println("! installed from a different source")
-				askForceInstallation(configuration)
+				exitCode = baseCmd.RunAsSudo(cmd, stdoutStderrPrinter("    "), stdoutStderrPrinter("    "))
 			}
-		} else {
-			err := install(configuration)
 
-			if err != nil {
-				return err
+			if exitCode == 0 {
+				fmt.Println("    \033[0;32mok\033[0m")
+			} else {
+				fmt.Printf("    \033[0;31mfail: %d\033[0m", exitCode)
+
+				if len(step.healthCheckCommands) > 0 {
+					fmt.Println()
+					fmt.Printf("\n\ninstallation pipeline faild: step %02d (%s) failed with exit code %d for '%s'\n\n", stepIndex+1, step.label, exitCode, cmd)
+					os.Exit(1)
+				} else {
+					fmt.Println("  ignoring...")
+				}
 			}
 		}
 
 		fmt.Println()
+
+		if len(step.healthCheckCommands) > 0 {
+			fmt.Printf("\033[0;36m  Health checking...\033[0m\n")
+
+			for _, healthCmd := range step.healthCheckCommands {
+				fmt.Printf("    \033[0;33m$\033[0m %s\n", healthCmd)
+
+				exitCode := baseCmd.RunAsHome(healthCmd, nil, nil)
+
+				if exitCode == 0 {
+					fmt.Println("      \033[1;32mok\033[0m")
+				} else {
+					fmt.Printf("      \033[1;31mfail: %d\033[0m\n", exitCode)
+
+					fmt.Printf("\n\ninstallation pipeline faild during helth check: step %02d (%s) failed with exit code %d while health checking '%s'\n\n", stepIndex+1, step.label, exitCode, healthCmd)
+					os.Exit(1)
+				}
+			}
+		} else {
+			fmt.Printf("\033[0;36m  No health checks...\033[0m\n")
+		}
+	}
+}
+
+func stdoutStderrPrinter(padding string) *func(string) {
+	printer := func(text string) {
+		fmt.Printf("\033[2;38m%s%s\033[0m\n", padding, text)
 	}
 
-	return nil
+	return &printer
 }

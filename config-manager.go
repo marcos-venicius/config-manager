@@ -1,33 +1,27 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 
 	"github.com/marcos-venicius/config-manager/commands"
-	"github.com/marcos-venicius/config-manager/utils"
 )
 
 func main() {
-	const VERSION = "2.3.1"
+	// bake it during build with commit and date
+	const VERSION = "3.0.0"
 
-	update := flag.Bool("update", false, "update all settings")
-	install := flag.Bool("install", false, "install all settings")
-	version := flag.Bool("version", false, "view current version")
-
-	flag.Parse()
+	args := CreateArgumentsParser().Parse()
 
 	switch true {
-	case *version:
+	case args.version:
 		fmt.Println(VERSION)
-	case *update:
-		utils.ErrorPrinter(commands.Update())
-	case *install:
-		utils.ErrorPrinter(commands.Install())
+	case args.help:
+		args.Help()
+	case args.install:
+		commands.Install()
 	default:
-		flag.Usage()
-		fmt.Printf("\nUse one of the options above\n")
+		args.Help()
 		os.Exit(1)
 	}
 }

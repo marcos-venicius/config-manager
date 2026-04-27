@@ -1,0 +1,46 @@
+% Run health checks before commands
+
+.state done
+.date 2026-03-21 15:14:32-03:00
+.tags mid_priority
+
+If the health checks succeeds, just skip that step, cause it's done.
+
+% Add a new step to install Wodo
+
+.state todo
+.date 2026-03-21 15:13:17-03:00
+.tags
+
+% Create a separated command for bash setup
+
+.state todo
+.date 2026-03-21 15:11:38-03:00
+.tags mid_priority
+
+Instead of poluting the main `.bashrc` file in the machine, create a
+source file with all needed configurations and just source at the end
+of the machine's `.bashrc`.
+
+Build this file at runtime based on the `config-manager` path location.
+
+% Configure installed resources in the machine
+
+.state todo
+.date 2026-03-21 15:09:15-03:00
+.tags high_priority
+.remind
+
+Now, we have the install command.
+This command only install the tools, with no configuration.
+Create a new command to configure.
+Maybe creating the folders and linking the files.
+
+% Do not use default go flags tool
+
+.state done
+.date 2026-03-21 15:10:31-03:00
+.tags low_priority
+
+Instead of flags, just accept normal commands like "install" and "configure". Something like that.
+
