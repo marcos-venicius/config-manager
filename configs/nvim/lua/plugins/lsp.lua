@@ -59,10 +59,10 @@ return {
         },
         signs = {
           text = {
-            [vim.diagnostic.severity.ERROR] = "E ",
-            [vim.diagnostic.severity.WARN] = "W ",
-            [vim.diagnostic.severity.INFO] = "I ",
-            [vim.diagnostic.severity.HINT] = "H ",
+            [vim.diagnostic.severity.ERROR] = " ", -- nf-fa-times_circle
+            [vim.diagnostic.severity.WARN]  = " ", -- nf-fa-exclamation_triangle
+            [vim.diagnostic.severity.INFO]  = " ", -- nf-fa-info_circle
+            [vim.diagnostic.severity.HINT]  = " ", -- nf-fa-lightbulb_o
           },
           numhl = {
             [vim.diagnostic.severity.ERROR] = "ErrorMsg",
