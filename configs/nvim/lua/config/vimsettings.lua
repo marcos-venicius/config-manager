@@ -1,6 +1,7 @@
 local opt = vim.opt
 
 vim.o.path = vim.o.path .. ",**"
+vim.o.autocomplete = true
 
 opt.wildignore:append { "*.pyc", "node_modules/", ".git/" }
 opt.signcolumn = "yes"
