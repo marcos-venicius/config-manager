@@ -2,8 +2,8 @@ local opt = vim.opt
 
 vim.o.path = vim.o.path .. ",**"
 
-opt.wildignore:append { "*.pyc", "node_modules/**", ".git/**" }
-opt.signcolumn = "no"
+opt.wildignore:append { "*.pyc", "node_modules/", ".git/" }
+opt.signcolumn = "yes"
 opt.expandtab = true
 opt.wildmenu = true
 opt.hlsearch = true
@@ -21,7 +21,7 @@ opt.ignorecase = true
 opt.hidden = true
 opt.splitbelow = true
 opt.splitright = true
-opt.cursorline = false
+opt.cursorline = true
 opt.smarttab = true
 opt.incsearch = true
 opt.lazyredraw = true
