@@ -1,7 +1,10 @@
 local opt = vim.opt
 
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
 vim.o.path = vim.o.path .. ",**"
-vim.o.autocomplete = true
+-- vim.o.autocomplete = true
 
 opt.wildignore:append { "*.pyc", "node_modules/", ".git/" }
 opt.signcolumn = "yes"
@@ -9,8 +12,8 @@ opt.expandtab = true
 opt.wildmenu = true
 opt.hlsearch = true
 opt.ruler = true
-opt.number = false
-opt.relativenumber = false
+opt.number = true
+opt.relativenumber = true
 opt.tabstop = 2
 opt.shiftwidth = 2
 opt.softtabstop = 2
@@ -22,10 +25,10 @@ opt.ignorecase = true
 opt.hidden = true
 opt.splitbelow = true
 opt.splitright = true
-opt.cursorline = true
+opt.cursorline = false
 opt.smarttab = true
 opt.incsearch = true
-opt.lazyredraw = true
+opt.lazyredraw = false
 opt.magic = true
 opt.showmatch = true
 opt.fileformat = "unix"

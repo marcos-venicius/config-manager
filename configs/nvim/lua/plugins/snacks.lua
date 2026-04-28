@@ -6,22 +6,11 @@ return {
     bigfile = { enabled = true },
     dashboard = { enabled = false },
     explorer = { enabled = false },
-    image = {
-      enabled = true,
-      doc = {
-        enabled = true,
-        inline = true,
-        float = true,
-        max_width = 80,
-        max_height = 40,
-      },
-    },
+    image = { enabled = false },
     indent = { enabled = false },
     input = { enabled = true },
     notifier = { enabled = true, timeout = 3000, width = { min = 0.5, max = 0.6 } },
-    picker = {
-      enabled = false,
-    },
+    picker = { enabled = false },
     quickfile = { enabled = true },
     scope = { enabled = true },
     scroll = { enabled = false },
@@ -33,6 +22,7 @@ return {
   keys = {
     { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "Document Symbols" },
     { "<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "Workspace Symbols" },
+    { "<leader>x", function() Snacks.picker.explorer() end, desc = "File Explorer" },
 
     { "<leader>nn", function() Snacks.notifier.show_history() end, desc = "Notification History" },
     { "<leader>nd", function() Snacks.notifier.hide() end, desc = "Dismiss All" },
