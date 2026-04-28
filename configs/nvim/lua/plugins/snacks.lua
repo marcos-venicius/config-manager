@@ -23,6 +23,16 @@ return {
     { "<leader>ls", function() Snacks.picker.lsp_symbols() end, desc = "Document Symbols" },
     { "<leader>lS", function() Snacks.picker.lsp_workspace_symbols() end, desc = "Workspace Symbols" },
     { "<leader>x", function() Snacks.picker.explorer() end, desc = "File Explorer" },
+    { "<leader>F", function() Snacks.picker.files() end, desc = "Files" },
+    { "<leader>d", function() Snacks.picker.diagnostics() end, desc = "Diagnostics" },
+    { "<leader>b", function() Snacks.picker.buffers() end, desc = "Buffers" },
+    { "<leader>G", function() Snacks.picker.grep() end, desc = "Grep" },
+
+    { "<leader>gd", function() Snacks.picker.git_diff() end, desc = "Git Diff" },
+    { "<leader>gf", function() Snacks.picker.git_files() end, desc = "Git Files" },
+    { "<leader>gl", function() Snacks.picker.git_log() end, desc = "Git Log" },
+    { "<leader>gb", function() Snacks.picker.git_branches() end, desc = "Git Log" },
+    { "<leader>/", function() Snacks.picker.git_grep() end, desc = "Git Grep" },
 
     { "<leader>nn", function() Snacks.notifier.show_history() end, desc = "Notification History" },
     { "<leader>nd", function() Snacks.notifier.hide() end, desc = "Dismiss All" },
