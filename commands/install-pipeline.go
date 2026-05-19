@@ -172,8 +172,13 @@ var installationSteps = []step_t{
 	},
 	{
 		label: "Nim",
+		asHome: true,
 		commands: []string{
-			"curl https://nim-lang.org/choosenim/init.sh -sSf | sh",
+			"curl https://nim-lang.org/choosenim/init.sh -sSf > /tmp/choosenim-init.sh",
+			"chmod u+x /tmp/choosenim-init.sh",
+			"/tmp/choosenim-init.sh -y",
+			"echo 'export PATH=$HOME/.nimble/bin:$PATH' >> ~/.bashrc",
+			"rm /tmp/choosenim-init.sh",
 		},
 		healthCheckCommands: []string{
 			"$HOME/.nimble/bin/nim --version",
