@@ -5,14 +5,15 @@ vim.g.maplocalleader = " "
 
 vim.o.path = vim.o.path .. ",**"
 
+opt.laststatus = 0
 opt.wildignore:append { "*.pyc", "node_modules/", ".git/" }
 opt.signcolumn = "yes"
 opt.expandtab = true
 opt.wildmenu = true
 opt.hlsearch = true
 opt.ruler = true
-opt.number = true
-opt.relativenumber = true
+opt.number = false
+opt.relativenumber = false
 opt.tabstop = 2
 opt.shiftwidth = 2
 opt.softtabstop = 2

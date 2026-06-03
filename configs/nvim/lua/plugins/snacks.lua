@@ -11,7 +11,14 @@ return {
     indent = { enabled = false },
     input = { enabled = true },
     notifier = { enabled = true, timeout = 3000, width = { min = 0.5, max = 0.6 } },
-    picker = { enabled = true },
+    picker = {
+      enabled = true,
+      actions = {
+        ["<C-q>"] = function(picker)
+          Snacks.picker.actions.qflist_all(picker)
+        end,
+      }
+    },
     quickfile = { enabled = true },
     scope = { enabled = true },
     scroll = { enabled = false },

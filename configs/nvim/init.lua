@@ -1,4 +1,4 @@
-require('vim._core.ui2').enable() -- not stable yet
+-- require('vim._core.ui2').enable() -- not stable yet
 require('config.vimsettings')
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
