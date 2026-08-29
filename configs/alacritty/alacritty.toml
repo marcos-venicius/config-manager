@@ -1,6 +1,7 @@
 [window]
-padding = { x = 5, y = 1 }
-decorations = "None"
+# opacity = 0.9
+padding = { x = 5, y = 0 }
+# decorations = "None"
 dynamic_title = false
 
 [font]
@@ -10,29 +11,82 @@ size = 9
 [mouse]
 hide_when_typing = true
 
+# =============================================================
+# zenburned - https://github.com/marcos-venicius/zenburned
+# =============================================================
+
 [colors.primary]
-background = "#141414"
-foreground = "#d3c6aa"
+background        = "#0E0E0E"  # zen_bg
+foreground        = "#EAEADC"  # zen_fg
+dim_foreground    = "#858575"  # zen_fg1
+bright_foreground = "#FFFFFF"  # zen_fg2
+
+[colors.cursor]
+text   = "#0E0E0E"  # zen_bg
+cursor = "#FFFFFF"  # zen_fg2
+
+[colors.vi_mode_cursor]
+text   = "#0E0E0E"  # zen_bg
+cursor = "#F0E6B4"  # zen_yellow
+
+[colors.selection]
+text       = "CellForeground"
+background = "#383838"  # zen_bg03 (Visual)
+
+[colors.search.matches]
+foreground = "#FFFFFF"  # zen_fg2
+background = "#383838"  # zen_bg03 (Search)
+
+[colors.search.focused_match]
+foreground = "#0E0E0E"  # zen_bg
+background = "#F0E6B4"  # zen_yellow
+
+[colors.footer_bar]
+foreground = "#EAEADC"  # zen_fg
+background = "#2B2B2B"  # zen_bg1
+
+[colors.hints.start]
+foreground = "#0E0E0E"  # zen_bg
+background = "#F0E6B4"  # zen_yellow
+
+[colors.hints.end]
+foreground = "#0E0E0E"  # zen_bg
+background = "#EFC9A9"  # zen_orange
 
 [colors.normal]
-black   = "#414b50"
-red     = "#e67e80"
-green   = "#a7c080"
-yellow  = "#dbbc7f"
-blue    = "#7fbbb3"
-magenta = "#d699b6"
-cyan    = "#83c092"
-white   = "#d3c6aa"
+black   = "#2B2B2B"  # zen_bg1
+red     = "#CC8383"  # zenburn_red_1
+green   = "#8FBC8F"  # zen_green_1
+yellow  = "#E0CF9F"  # zen_yellow_2
+blue    = "#9CDCDA"  # zen_blue
+magenta = "#DCA3C5"  # derived from zen_red
+cyan    = "#BCE0E3"  # zen_blue2
+white   = "#EAEADC"  # zen_fg
 
 [colors.bright]
-black   = "#475258"
-red     = "#e67e80"
-green   = "#a7c080"
-yellow  = "#dbbc7f"
-blue    = "#7fbbb3"
-magenta = "#d699b6"
-cyan    = "#83c092"
-white   = "#d3c6aa"
+black   = "#707070"  # zen_bg2
+red     = "#DCA3A3"  # zen_red
+green   = "#AFD8AF"  # zen_green1
+yellow  = "#F0E6B4"  # zen_yellow
+blue    = "#B4E8E6"
+magenta = "#ECB8D5"
+cyan    = "#D1EFF0"
+white   = "#FFFFFF"  # zen_fg2
+
+[colors.dim]
+black   = "#1C1C1C"  # zen_bg4
+red     = "#8C4343"  # zen_red_3
+green   = "#6F8F6F"
+yellow  = "#B0A47F"
+blue    = "#6C888B"  # zen_blue_3
+magenta = "#A87B96"
+cyan    = "#7CA0A3"  # zen_blue_2
+white   = "#858575"  # zen_fg1
 
 [env]
 TERM = "alacritty"
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
