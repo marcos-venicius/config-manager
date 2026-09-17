@@ -12,76 +12,76 @@ size = 9
 hide_when_typing = true
 
 # =============================================================
-# zenburned - https://github.com/marcos-venicius/zenburned
+# Catppuccin Mocha - https://github.com/catppuccin/alacritty
 # =============================================================
 
 [colors.primary]
-background        = "#0E0E0E"  # zen_bg
-foreground        = "#EAEADC"  # zen_fg
-dim_foreground    = "#858575"  # zen_fg1
-bright_foreground = "#FFFFFF"  # zen_fg2
+background        = "#1E1E2E"  # base
+foreground        = "#CDD6F4"  # text
+dim_foreground    = "#7F849C"  # overlay1
+bright_foreground = "#CDD6F4"  # text
 
 [colors.cursor]
-text   = "#0E0E0E"  # zen_bg
-cursor = "#FFFFFF"  # zen_fg2
+text   = "#1E1E2E"  # base
+cursor = "#F5E0DC"  # rosewater
 
 [colors.vi_mode_cursor]
-text   = "#0E0E0E"  # zen_bg
-cursor = "#F0E6B4"  # zen_yellow
+text   = "#1E1E2E"  # base
+cursor = "#B4BEFE"  # lavender
 
 [colors.selection]
-text       = "CellForeground"
-background = "#383838"  # zen_bg03 (Visual)
+text       = "#1E1E2E"  # base
+background = "#F5E0DC"  # rosewater
 
 [colors.search.matches]
-foreground = "#FFFFFF"  # zen_fg2
-background = "#383838"  # zen_bg03 (Search)
+foreground = "#1E1E2E"  # base
+background = "#A6ADC8"  # subtext0
 
 [colors.search.focused_match]
-foreground = "#0E0E0E"  # zen_bg
-background = "#F0E6B4"  # zen_yellow
+foreground = "#1E1E2E"  # base
+background = "#A6E3A1"  # green
 
 [colors.footer_bar]
-foreground = "#EAEADC"  # zen_fg
-background = "#2B2B2B"  # zen_bg1
+foreground = "#1E1E2E"  # base
+background = "#A6ADC8"  # subtext0
 
 [colors.hints.start]
-foreground = "#0E0E0E"  # zen_bg
-background = "#F0E6B4"  # zen_yellow
+foreground = "#1E1E2E"  # base
+background = "#F9E2AF"  # yellow
 
 [colors.hints.end]
-foreground = "#0E0E0E"  # zen_bg
-background = "#EFC9A9"  # zen_orange
+foreground = "#1E1E2E"  # base
+background = "#A6ADC8"  # subtext0
 
 [colors.normal]
-black   = "#2B2B2B"  # zen_bg1
-red     = "#CC8383"  # zenburn_red_1
-green   = "#8FBC8F"  # zen_green_1
-yellow  = "#E0CF9F"  # zen_yellow_2
-blue    = "#9CDCDA"  # zen_blue
-magenta = "#DCA3C5"  # derived from zen_red
-cyan    = "#BCE0E3"  # zen_blue2
-white   = "#EAEADC"  # zen_fg
+black   = "#45475A"  # surface1
+red     = "#F38BA8"  # red
+green   = "#A6E3A1"  # green
+yellow  = "#F9E2AF"  # yellow
+blue    = "#89B4FA"  # blue
+magenta = "#F5C2E7"  # pink
+cyan    = "#94E2D5"  # teal
+white   = "#BAC2DE"  # subtext1
 
 [colors.bright]
-black   = "#707070"  # zen_bg2
-red     = "#DCA3A3"  # zen_red
-green   = "#AFD8AF"  # zen_green1
-yellow  = "#F0E6B4"  # zen_yellow
-blue    = "#B4E8E6"
-magenta = "#ECB8D5"
-cyan    = "#D1EFF0"
-white   = "#FFFFFF"  # zen_fg2
+black   = "#585B70"  # surface2
+red     = "#F38BA8"  # red
+green   = "#A6E3A1"  # green
+yellow  = "#F9E2AF"  # yellow
+blue    = "#89B4FA"  # blue
+magenta = "#F5C2E7"  # pink
+cyan    = "#94E2D5"  # teal
+white   = "#A6ADC8"  # subtext0
 
 [colors.dim]
-black   = "#1C1C1C"  # zen_bg4
-red     = "#8C4343"  # zen_red_3
-green   = "#6F8F6F"
-yellow  = "#B0A47F"
-blue    = "#6C888B"  # zen_blue_3
-magenta = "#A87B96"
-cyan    = "#7CA0A3"  # zen_blue_2
-white   = "#858575"  # zen_fg1
+black   = "#45475A"  # surface1
+red     = "#F38BA8"  # red
+green   = "#A6E3A1"  # green
+yellow  = "#F9E2AF"  # yellow
+blue    = "#89B4FA"  # blue
+magenta = "#F5C2E7"  # pink
+cyan    = "#94E2D5"  # teal
+white   = "#BAC2DE"  # subtext1
 
 [env]
 TERM = "alacritty"
