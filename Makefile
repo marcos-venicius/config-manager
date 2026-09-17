@@ -19,7 +19,7 @@ build-go:
 
 install: build-image build-go
 	@echo "Running './$(BINARY_NAME) install' inside $(IMAGE_NAME)..."
-	docker run --rm -v $(shell pwd):/app -w /app $(IMAGE_NAME) sudo ./$(BINARY_NAME) install
+	docker run --rm -v $(shell pwd):/app -w /app $(IMAGE_NAME) sudo CONFIG_MANAGER_DIR=/app ./$(BINARY_NAME) install -ignore desktop
 
 clean:
 	docker image rm $(IMAGE_NAME) 2>/dev/null || true

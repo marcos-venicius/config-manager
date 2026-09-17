@@ -1,0 +1,14 @@
+[[language]]
+name = "r"
+file-types = ["R", "mca"]
+
+[[language]]
+name = "awk"
+file-types = ["awk", "txr"]
+
+[[language]]
+name = "markdown"
+file-types = [
+  "md",
+  { glob = "*-*-*-*.txt" } # this is used for my [daily tool](https://github.com/marcos-venicius/daily)
+]

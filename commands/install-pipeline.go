@@ -1,15 +1,19 @@
 package commands
 
+import "fmt"
+
 var installationSteps = []step_t{
 	{
-		label: "APT GET Update",
+		label:  "APT GET Update",
+		groups: []string{"base"},
 		commands: []string{
 			"apt-get update -y",
 			"apt-get upgrade -y",
 		},
 	},
 	{
-		label: "Install add-apt-repository",
+		label:  "Install add-apt-repository",
+		groups: []string{"base"},
 		commands: []string{
 			"apt-get install software-properties-common -y",
 		},
@@ -18,7 +22,8 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Curl + Wget",
+		label:  "Curl + Wget",
+		groups: []string{"base"},
 		commands: []string{
 			"apt-get install curl -y",
 			"apt-get install wget -y",
@@ -29,7 +34,8 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Build Essentials",
+		label:  "Build Essentials",
+		groups: []string{"base"},
 		commands: []string{
 			"apt-get install build-essential -y",
 		},
@@ -39,7 +45,8 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Install CLang",
+		label:  "Install CLang",
+		groups: []string{"clang"},
 		commands: []string{
 			"apt-get install clang -y",
 		},
@@ -48,7 +55,8 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Ripgrep",
+		label:  "Ripgrep",
+		groups: []string{"ripgrep"},
 		commands: []string{
 			"apt-get install ripgrep -y",
 		},
@@ -57,7 +65,8 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "XClip",
+		label:  "XClip",
+		groups: []string{"clipboard"},
 		commands: []string{
 			"apt-get install xclip -y",
 		},
@@ -66,7 +75,19 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "GIT",
+		// clipboard on wayland sessions (tmux falls back to xclip on X11)
+		label:  "WL Clipboard",
+		groups: []string{"clipboard"},
+		commands: []string{
+			"apt-get install wl-clipboard -y",
+		},
+		healthCheckCommands: []string{
+			"which wl-copy",
+		},
+	},
+	{
+		label:  "GIT",
+		groups: []string{"git"},
 		commands: []string{
 			"add-apt-repository ppa:git-core/ppa -y",
 			"apt-get update -y",
@@ -77,12 +98,29 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		label:  "Kubectl",
+		groups: []string{"kubectl"},
+		commands: []string{
+			"apt-get install ca-certificates gnupg -y",
+			"mkdir -p -m 755 /etc/apt/keyrings",
+			"curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.35/deb/Release.key | gpg --dearmor --yes -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg",
+			"echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.35/deb/ /' > /etc/apt/sources.list.d/kubernetes.list",
+			"apt-get update -y",
+			"apt-get install kubectl -y",
+		},
+		healthCheckCommands: []string{
+			"kubectl version --client",
+		},
+	},
+	{
 		label:  "Cargo",
+		groups: []string{"cargo"},
 		asHome: true,
 		commands: []string{
 			"curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > /tmp/rustc.sh",
 			"chmod u+x /tmp/rustc.sh",
-			"/tmp/rustc.sh -y",
+			// PATH is handled by configs/.bashrc
+			"/tmp/rustc.sh -y --no-modify-path",
 			"rm -rf /tmp/rustc.sh",
 		},
 		healthCheckCommands: []string{
@@ -90,7 +128,8 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Tmux",
+		label:  "Tmux",
+		groups: []string{"tmux"},
 		commands: []string{
 			"apt-get install tmux -y",
 		},
@@ -99,31 +138,27 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Neovim",
+		// helix is the only editor: purge any vim/neovim package and leftovers from the old neovim step
+		label:  "Remove Vim",
+		groups: []string{"helix"},
 		commands: []string{
-			"mkdir -p /tmp/neovim-installation",
-			"wget https://github.com/neovim/neovim/releases/latest/download/nvim-linux-x86_64.tar.gz -O /tmp/neovim-installation/file.tar.gz",
-			// TODO: Do I need to install tar?
-			"tar -xvf /tmp/neovim-installation/file.tar.gz -C /tmp/neovim-installation/",
-			"mkdir -p /tmp",
-			"mkdir -p /opt",
-			"mv /tmp/neovim-installation/nvim-linux-x86_64 /opt/nvim",
-			"mv /opt/nvim/bin/nvim /opt/nvim/bin/vi",
-			"ln -s /opt/nvim/bin/vi /usr/local/bin/vi",
-			"rm -rf /tmp/neovim-installation",
+			"pkgs=$(dpkg -l | awk '/^ii/ && $2 ~ /^(vim|neovim)([-:]|$)/ {print $2}'); [ -z \"$pkgs\" ] || apt-get purge -y $pkgs",
+			"apt-get autoremove -y",
+			"rm -rf /opt/nvim",
 		},
 		healthCheckCommands: []string{
-			"/opt/nvim/bin/vi --version",
+			"! dpkg -l | awk '/^ii/ && $2 ~ /^(vim|neovim)([-:]|$)/' | grep -q .",
+			"[ ! -e /opt/nvim ]",
 		},
 	},
 	{
-		label:    "Download & Build Helix",
-		asHome:   true,
-		disabled: true,
+		label:  "Download & Build Helix",
+		groups: []string{"helix"},
+		asHome: true,
 		commands: []string{
 			"mkdir -p $HOME/.config/helix",
 			"mkdir -p $HOME/tools",
-			"git clone --depth 1 https://github.com/helix-editor/helix.git $HOME/tools/helix",
+			"[ -d $HOME/tools/helix ] || git clone --depth 1 https://github.com/helix-editor/helix.git $HOME/tools/helix",
 			"cd $HOME/tools/helix && $HOME/.cargo/bin/cargo build --release",
 		},
 		healthCheckCommands: []string{
@@ -131,21 +166,48 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label:    "Install Helix",
-		disabled: true,
+		// runs as root, so $HOME is not the user's home
+		label:  "Install Helix",
+		groups: []string{"helix"},
 		commands: []string{
-			"ln -s $HOME/tools/helix/target/release/hx /usr/local/bin/hx",
+			"ln -sf \"$(getent passwd \"$SUDO_USER\" | cut -d: -f6)/tools/helix/target/release/hx\" /usr/local/bin/hx",
+		},
+		healthCheckCommands: []string{
+			"[ \"$(readlink /usr/local/bin/hx)\" = \"$HOME/tools/helix/target/release/hx\" ]",
+			"hx --version",
+		},
+	},
+	{
+		label:  "Helix runtime & grammars",
+		groups: []string{"helix"},
+		asHome: true,
+		commands: []string{
 			"ln -Tsf $HOME/tools/helix/runtime $HOME/.config/helix/runtime",
 			"hx --grammar fetch",
 			"hx --grammar build",
 		},
 		healthCheckCommands: []string{
-			"hx --version",
+			"[ \"$(readlink $HOME/.config/helix/runtime)\" = \"$HOME/tools/helix/runtime\" ]",
 			"find $HOME/.config/helix/runtime/grammars -type f -name '*.so' 2>/dev/null | grep -qoP '.*.so'",
 		},
 	},
 	{
+		label:  "Helix as default editor",
+		groups: []string{"helix"},
+		commands: []string{
+			"update-alternatives --install /usr/bin/editor editor /usr/local/bin/hx 100",
+			"update-alternatives --set editor /usr/local/bin/hx",
+			"update-alternatives --install /usr/bin/vi vi /usr/local/bin/hx 100",
+			"update-alternatives --set vi /usr/local/bin/hx",
+		},
+		healthCheckCommands: []string{
+			"[ \"$(readlink -f /usr/bin/editor)\" = \"$(readlink -f /usr/local/bin/hx)\" ]",
+			"[ \"$(readlink -f /usr/bin/vi)\" = \"$(readlink -f /usr/local/bin/hx)\" ]",
+		},
+	},
+	{
 		label:  "Dotnet",
+		groups: []string{"dotnet"},
 		asHome: true,
 		commands: []string{
 			"mkdir -p $HOME/tools/dotnet",
@@ -159,9 +221,10 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "GO Lang",
+		label:  "GO Lang",
+		groups: []string{"go"},
 		commands: []string{
-			"mkdir /tmp/golang-installation",
+			"rm -rf /tmp/golang-installation && mkdir -p /tmp/golang-installation",
 			"wget https://go.dev/dl/go1.26.1.linux-amd64.tar.gz -O /tmp/golang-installation/go1.26.1.linux-amd64.tar.gz",
 			"rm -rf /opt/go && tar -C /opt -xzf /tmp/golang-installation/go1.26.1.linux-amd64.tar.gz",
 			"rm -rf /tmp/golang-installation",
@@ -171,13 +234,14 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Nim",
+		label:  "Nim",
+		groups: []string{"nim"},
 		asHome: true,
 		commands: []string{
 			"curl https://nim-lang.org/choosenim/init.sh -sSf > /tmp/choosenim-init.sh",
 			"chmod u+x /tmp/choosenim-init.sh",
 			"/tmp/choosenim-init.sh -y",
-			"echo 'export PATH=$HOME/.nimble/bin:$PATH' >> ~/.bashrc",
+			// PATH is handled by configs/.bashrc
 			"rm /tmp/choosenim-init.sh",
 		},
 		healthCheckCommands: []string{
@@ -185,15 +249,9 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Gnome configs",
-		commands: []string{
-			"gsettings set org.gnome.shell.app-switcher current-workspace-only true",
-		},
-		healthCheckCommands: []string{},
-	},
-	{
 		// alacritty installation dependency
-		label: "Font config",
+		label:  "Font config",
+		groups: []string{"alacritty"},
 		commands: []string{
 			"apt-get install libfontconfig1-dev -y",
 		},
@@ -201,9 +259,12 @@ var installationSteps = []step_t{
 			"apt list --installed libfontconfig1-dev 2>/dev/null | grep -q '\\[installed\\]'",
 		},
 	},
-	// alacritty installation is too slow, keep it at the end
+	// keep it after every installer that may touch the dotfiles
+	linkConfigsStep(),
+	// alacritty installation is too slow, keep it (and its defaults) at the end
 	{
 		label:  "Alacritty",
+		groups: []string{"alacritty"},
 		asHome: true,
 		commands: []string{
 			"$HOME/.cargo/bin/cargo install alacritty",
@@ -212,4 +273,89 @@ var installationSteps = []step_t{
 			"$HOME/.cargo/bin/alacritty --version",
 		},
 	},
+	{
+		// cargo install does not ship the desktop entry nor the icon
+		label:  "Alacritty as default terminal",
+		groups: []string{"alacritty"},
+		asHome: true,
+		commands: []string{
+			"mkdir -p $HOME/.local/share/applications $HOME/.local/share/icons/hicolor/scalable/apps",
+			`set -o pipefail; curl -fsSL https://raw.githubusercontent.com/alacritty/alacritty/master/extra/linux/Alacritty.desktop | sed -E "s#^(TryExec|Exec)=alacritty#\1=$HOME/.cargo/bin/alacritty#" > $HOME/.local/share/applications/Alacritty.desktop`,
+			"curl -fsSL https://raw.githubusercontent.com/alacritty/alacritty/master/extra/logo/alacritty-term.svg -o $HOME/.local/share/icons/hicolor/scalable/apps/Alacritty.svg",
+			"! command -v update-desktop-database >/dev/null || update-desktop-database $HOME/.local/share/applications",
+			"! command -v xdg-mime >/dev/null || xdg-mime default Alacritty.desktop x-scheme-handler/terminal application/x-terminal-emulator",
+			// COSMIC terminal shortcut
+			`f=$HOME/.config/cosmic/com.system76.CosmicSettings.Shortcuts/v1/system_actions; ` +
+				`new=$(printf '{\n    Terminal: "%s",\n}' "$HOME/.cargo/bin/alacritty"); ` +
+				`mkdir -p "$(dirname "$f")" && ` +
+				`if [ -f "$f" ] && [ "$(cat "$f")" != "$new" ]; then cp "$f" "$f.bak.$(date +%s)"; fi && ` +
+				`printf '%s\n' "$new" > "$f"`,
+		},
+		healthCheckCommands: []string{
+			`grep -qx "Exec=$HOME/.cargo/bin/alacritty" $HOME/.local/share/applications/Alacritty.desktop`,
+			"[ -s $HOME/.local/share/icons/hicolor/scalable/apps/Alacritty.svg ]",
+			`! command -v xdg-mime >/dev/null || [ "$(xdg-mime query default x-scheme-handler/terminal)" = Alacritty.desktop ]`,
+			`grep -qF "Terminal: \"$HOME/.cargo/bin/alacritty\"" $HOME/.config/cosmic/com.system76.CosmicSettings.Shortcuts/v1/system_actions`,
+		},
+	},
+	{
+		// runs as root, so $HOME is not the user's home
+		label:  "Alacritty as x-terminal-emulator",
+		groups: []string{"alacritty"},
+		commands: []string{
+			`update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator "$(getent passwd "$SUDO_USER" | cut -d: -f6)/.cargo/bin/alacritty" 60`,
+			`update-alternatives --set x-terminal-emulator "$(getent passwd "$SUDO_USER" | cut -d: -f6)/.cargo/bin/alacritty"`,
+		},
+		healthCheckCommands: []string{
+			`[ "$(readlink -f /usr/bin/x-terminal-emulator)" = "$HOME/.cargo/bin/alacritty" ]`,
+		},
+	},
+}
+
+// repository root; defaults to the clone location described in the README
+const configManagerDir = "${CONFIG_MANAGER_DIR:-$HOME/.config-manager}"
+
+// linkConfig symlinks configs/<src> to dst, moving any existing non-symlink dst to dst.bak.<timestamp>
+func linkConfig(src, dst string) (command string, healthCheck string) {
+	target := configManagerDir + "/configs/" + src
+
+	command = fmt.Sprintf(
+		`test -e "%[1]s" && mkdir -p "$(dirname "%[2]s")" && if [ -e "%[2]s" ] && [ ! -L "%[2]s" ]; then mv "%[2]s" "%[2]s.bak.$(date +%%s)"; fi && ln -sfn "%[1]s" "%[2]s"`,
+		target, dst,
+	)
+	healthCheck = fmt.Sprintf(`[ "$(readlink "%s")" = "%s" ]`, dst, target)
+
+	return command, healthCheck
+}
+
+func linkConfigsStep() step_t {
+	links := [][2]string{
+		{".bashrc", "$HOME/.bashrc"},
+		{".gitconfig", "$HOME/.gitconfig"},
+		{".tmux.conf", "$HOME/.tmux.conf"},
+		{"alacritty", "$HOME/.config/alacritty"},
+		{"helix/config.toml", "$HOME/.config/helix/config.toml"},
+		{"helix/languages.toml", "$HOME/.config/helix/languages.toml"},
+	}
+
+	step := step_t{
+		label:  "Link configs",
+		groups: []string{"configs"},
+		asHome: true,
+		commands: []string{
+			`echo 'SELECTED_EDITOR="/usr/local/bin/hx"' > $HOME/.selected_editor`,
+		},
+		healthCheckCommands: []string{
+			`grep -qx 'SELECTED_EDITOR="/usr/local/bin/hx"' $HOME/.selected_editor`,
+		},
+	}
+
+	for _, link := range links {
+		command, healthCheck := linkConfig(link[0], link[1])
+
+		step.commands = append(step.commands, command)
+		step.healthCheckCommands = append(step.healthCheckCommands, healthCheck)
+	}
+
+	return step
 }

@@ -19,7 +19,7 @@ func main() {
 	case args.help:
 		args.Help()
 	case args.install:
-		commands.Install()
+		commands.Install(args.ignore)
 	default:
 		args.Help()
 		os.Exit(1)

@@ -1,13 +1,14 @@
 [user]
-  name = Marcos Venicius
+	name = Marcos
+	email = marcosdevelopment.business@gmail.com
 
 [core]
-	editor = vi
+	editor = hx
 	excludesFile = ~/.gitignore
 
 [alias]
   co = checkout
-  lg = log --graph --pretty=fuller --stat --notes --dirstat --abbrev-commit --decorate --all
+  lg = log --graph --pretty=fuller --stat --notes --dirstat --decorate --all
   c = commit
   ac = !git add -A && git commit
   st = status -sb

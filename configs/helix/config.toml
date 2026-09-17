@@ -1,0 +1,58 @@
+# theme = "dark_plus"
+# theme = "gruber-darker"
+# theme = "darcula"
+# theme = "ao"
+# theme = "zenburned"
+# theme = "base16_transparent"
+# theme = "gruvbox_dark_hard"
+theme = "catppuccin_mocha"
+
+[editor]
+line-number = "relative"
+bufferline = "multiple"
+color-modes = true
+true-color = true
+insert-final-newline = false
+auto-pairs = true
+
+[editor.auto-save]
+after-delay.enable = true
+after-delay.timeout = 1000
+
+[editor.search]
+smart-case = true
+wrap-around = true
+
+[editor.file-picker]
+git-ignore = true
+hidden = false
+
+[editor.whitespace.render]
+tab = "all"
+newline = "all"
+
+[editor.lsp]
+auto-signature-help = false
+display-messages = true
+
+[editor.statusline]
+left = ["mode", "spinner", "version-control", "file-name", "read-only-indicator", "file-modification-indicator"]
+right = ["diagnostics", "selections", "register", "position", "position-percentage", "file-encoding", "file-line-ending"]
+mode.normal = "NORMAL"
+mode.insert = "INSERT"
+mode.select = "SELECT"
+
+# [editor.cursor-shape]
+# insert = "empty-box"
+
+[editor.indent-guides]
+render = true
+skip-levels = 0
+
+[keys.insert]
+"C-n" = "completion"
+"C-space" = "completion"
+
+[keys.normal.space]
+B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
+M = ":! mark %{buffer_name}"

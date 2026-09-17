@@ -3,28 +3,75 @@ package commands
 import (
 	"fmt"
 	"os"
+	"slices"
+	"strings"
 
 	"github.com/marcos-venicius/config-manager/sys"
 )
 
 type step_t struct {
 	label               string
-	asHome              bool // do not run commands as sudo
+	groups              []string // used by `-ignore`; a step is skipped when any of its groups is ignored
+	asHome              bool     // do not run commands as sudo
 	disabled            bool
 	commands            []string
 	healthCheckCommands []string
 }
 
-func Install() {
+func allSteps() []step_t {
+	return append(append([]step_t{}, installationSteps...), desktopSteps...)
+}
+
+// Groups returns every known step group, in pipeline order
+func Groups() []string {
+	seen := map[string]bool{}
+	groups := []string{}
+
+	for _, step := range allSteps() {
+		for _, group := range step.groups {
+			if !seen[group] {
+				seen[group] = true
+				groups = append(groups, group)
+			}
+		}
+	}
+
+	return groups
+}
+
+func ignoredGroup(step step_t, ignore []string) (string, bool) {
+	for _, group := range step.groups {
+		if slices.Contains(ignore, group) {
+			return group, true
+		}
+	}
+
+	return "", false
+}
+
+func Install(ignore []string) {
+	for _, group := range ignore {
+		if !slices.Contains(Groups(), group) {
+			fmt.Printf("fatal: unknown group '%s'. available groups: %s\n", group, strings.Join(Groups(), ", "))
+			os.Exit(1)
+		}
+	}
+
 	baseCmd := sys.Command()
 
-	for stepIndex, step := range installationSteps {
+	for stepIndex, step := range allSteps() {
 		if stepIndex > 0 {
 			fmt.Println()
 		}
 
 		if step.disabled {
 			fmt.Printf("\033[0;34mStep %02d \033[2;36m(disabled)\033[0;34m: %s\033[0m\n", stepIndex+1, step.label)
+			fmt.Printf("  \033[2;36mSkipping...\033[0m\n")
+			continue
+		}
+
+		if group, ok := ignoredGroup(step, ignore); ok {
+			fmt.Printf("\033[0;34mStep %02d \033[2;36m(ignored: %s)\033[0;34m: %s\033[0m\n", stepIndex+1, group, step.label)
 			fmt.Printf("  \033[2;36mSkipping...\033[0m\n")
 			continue
 		}
