@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>config-manager</title>
+  <meta name="description" content="One command to turn a fresh Ubuntu install into a ready-to-code machine: tools, dotfiles, editor, terminal and desktop preferences.">
+  <meta property="og:title" content="config-manager">
+  <meta property="og:description" content="One command to turn a fresh Ubuntu install into a ready-to-code machine.">
+  <meta property="og:type" content="website">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚙️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* catppuccin latte */
+    :root {
+      --base: #eff1f5; --mantle: #e6e9ef; --crust: #dce0e8;
+      --surface0: #ccd0da; --surface1: #bcc0cc;
+      --text: #4c4f69; --subtext: #6c6f85; --overlay: #9ca0b0;
+      --blue: #1e66f5; --sky: #04a5e5; --green: #40a02b; --yellow: #df8e1d;
+      --red: #d20f39; --mauve: #8839ef; --peach: #fe640b;
+      --term-bg: #1e1e2e; --term-text: #cdd6f4; --term-dim: #7f849c;
+      --term-blue: #89b4fa; --term-sky: #89dceb; --term-green: #a6e3a1; --term-yellow: #f9e2af; --term-red: #f38ba8;
+      --shadow: 0 20px 50px -20px rgba(76, 79, 105, .35);
+    }
+    /* catppuccin mocha */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --base: #1e1e2e; --mantle: #181825; --crust: #11111b;
+        --surface0: #313244; --surface1: #45475a;
+        --text: #cdd6f4; --subtext: #a6adc8; --overlay: #6c7086;
+        --blue: #89b4fa; --sky: #89dceb; --green: #a6e3a1; --yellow: #f9e2af;
+        --red: #f38ba8; --mauve: #cba6f7; --peach: #fab387;
+        --term-bg: #11111b;
+        --shadow: 0 20px 60px -20px rgba(0, 0, 0, .7);
+      }
+    }
+    :root[data-theme="dark"] {
+      --base: #1e1e2e; --mantle: #181825; --crust: #11111b;
+      --surface0: #313244; --surface1: #45475a;
+      --text: #cdd6f4; --subtext: #a6adc8; --overlay: #6c7086;
+      --blue: #89b4fa; --sky: #89dceb; --green: #a6e3a1; --yellow: #f9e2af;
+      --red: #f38ba8; --mauve: #cba6f7; --peach: #fab387;
+      --term-bg: #11111b;
+      --shadow: 0 20px 60px -20px rgba(0, 0, 0, .7);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--base);
+      color: var(--text);
+      font: 16px/1.6 Inter, system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, pre, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+    code { background: var(--mantle); border: 1px solid var(--surface0); padding: .05em .35em; border-radius: 5px; font-size: .88em; }
+
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+    /* nav */
+    nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--base) 85%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--surface0); }
+    nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+    .brand { font-family: "JetBrains Mono", monospace; font-weight: 600; color: var(--text); }
+    .brand span { color: var(--mauve); }
+    nav ul { list-style: none; display: flex; gap: 22px; margin: 0; padding: 0; align-items: center; }
+    nav ul a { color: var(--subtext); font-size: .93rem; }
+    nav ul a:hover { color: var(--text); text-decoration: none; }
+    .theme-toggle { display: grid; place-items: center; background: none; border: 1px solid var(--surface0); color: var(--subtext); border-radius: 8px; width: 34px; height: 34px; cursor: pointer; font-size: 1rem; }
+    @media (max-width: 640px) { nav ul li.hide-sm { display: none; } }
+
+    /* hero */
+    .hero { padding: 72px 0 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); padding-top: 44px; gap: 36px; } }
+    .eyebrow { display: inline-block; font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mauve); background: color-mix(in srgb, var(--mauve) 12%, transparent); padding: 4px 10px; border-radius: 99px; }
+    h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.08; letter-spacing: -.03em; margin: 18px 0 16px; font-weight: 800; }
+    h1 em { font-style: normal; background: linear-gradient(90deg, var(--blue), var(--mauve)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .lead { font-size: 1.15rem; color: var(--subtext); margin: 0 0 28px; max-width: 34em; }
+
+    .install { display: flex; align-items: stretch; background: var(--mantle); border: 1px solid var(--surface0); border-radius: 12px; overflow: hidden; max-width: 100%; }
+    .install pre { margin: 0; padding: 14px 16px; overflow-x: auto; font-size: .85rem; flex: 1; min-width: 0; }
+    .install pre .p { color: var(--overlay); user-select: none; }
+    .copy { border: 0; border-left: 1px solid var(--surface0); background: transparent; color: var(--subtext); padding: 0 16px; cursor: pointer; font: 500 .85rem Inter, sans-serif; }
+    .copy:hover { color: var(--text); background: var(--surface0); }
+    .cta { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 10px; font-weight: 600; font-size: .95rem; }
+    .btn:hover { text-decoration: none; filter: brightness(1.08); }
+    .btn.primary { background: var(--blue); color: var(--crust); }
+    .btn.ghost { border: 1px solid var(--surface1); color: var(--text); }
+
+    /* terminal */
+    .term { background: var(--term-bg); border-radius: 14px; box-shadow: var(--shadow); border: 1px solid color-mix(in srgb, var(--surface1) 60%, transparent); overflow: hidden; min-width: 0; }
+    .term-bar { display: flex; align-items: center; gap: 7px; padding: 12px 14px; background: color-mix(in srgb, var(--term-bg) 80%, #45475a); }
+    .term-bar i { flex: none; width: 11px; height: 11px; border-radius: 50%; background: #f38ba8; }
+    .term-bar i:nth-child(2) { background: #f9e2af; }
+    .term-bar i:nth-child(3) { background: #a6e3a1; }
+    .term-bar span { margin-left: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; color: var(--term-dim); font: .78rem "JetBrains Mono", monospace; }
+    .term-body { height: 390px; overflow: hidden; padding: 16px 18px; color: var(--term-text); font: .8rem/1.55 "JetBrains Mono", monospace; white-space: pre-wrap; word-break: break-word; }
+    .t-blue { color: var(--term-blue); } .t-sky { color: var(--term-sky); } .t-green { color: var(--term-green); font-weight: 600; }
+    .t-yellow { color: var(--term-yellow); } .t-dim { color: var(--term-dim); } .t-red { color: var(--term-red); }
+    .cursor { display: inline-block; width: .55em; height: 1.1em; background: var(--term-text); vertical-align: text-bottom; animation: blink 1s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    /* sections */
+    section { padding: 64px 0; }
+    section + section { border-top: 1px solid var(--surface0); }
+    h2 { font-size: clamp(1.6rem, 3.4vw, 2.2rem); letter-spacing: -.02em; margin: 0 0 10px; }
+    .section-lead { color: var(--subtext); margin: 0 0 36px; max-width: 40em; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; }
+    .card { background: var(--mantle); border: 1px solid var(--surface0); border-radius: 14px; padding: 22px; }
+    .card h3 { margin: 12px 0 6px; font-size: 1.05rem; }
+    .card p { margin: 0; color: var(--subtext); font-size: .95rem; }
+    .icon { width: 38px; height: 38px; border-radius: 10px; display: grid; place-items: center; font-size: 1.15rem; }
+
+    /* groups */
+    .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+    .group { border: 1px solid var(--surface0); border-radius: 12px; padding: 16px 18px; background: var(--base); }
+    .group header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+    .group strong { font-size: .98rem; }
+    .tag { font: .72rem "JetBrains Mono", monospace; color: var(--mauve); background: color-mix(in srgb, var(--mauve) 12%, transparent); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+    .group p { margin: 0; color: var(--subtext); font-size: .9rem; }
+
+    .ignore-demo { margin-top: 28px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; color: var(--subtext); font-size: .95rem; }
+    .ignore-demo pre { margin: 0; background: var(--mantle); border: 1px solid var(--surface0); border-radius: 10px; padding: 10px 14px; font-size: .85rem; overflow-x: auto; max-width: 100%; color: var(--text); }
+
+    /* steps */
+    .steps { counter-reset: step; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+    .step { position: relative; padding: 22px 22px 22px 70px; border-radius: 14px; background: var(--mantle); border: 1px solid var(--surface0); }
+    .step::before { counter-increment: step; content: counter(step, decimal-leading-zero); position: absolute; left: 20px; top: 20px; font: 600 1.1rem "JetBrains Mono", monospace; color: var(--blue); }
+    .step h3 { margin: 0 0 6px; font-size: 1.02rem; }
+    .step p { margin: 0; color: var(--subtext); font-size: .93rem; }
+    .step pre { margin: 10px 0 0; font-size: .78rem; background: var(--base); border: 1px solid var(--surface0); border-radius: 8px; padding: 8px 10px; overflow-x: auto; }
+
+    .note { margin-top: 36px; border-left: 3px solid var(--yellow); background: color-mix(in srgb, var(--yellow) 10%, transparent); padding: 14px 18px; border-radius: 0 10px 10px 0; color: var(--text); font-size: .95rem; }
+
+    footer { border-top: 1px solid var(--surface0); padding: 28px 0 40px; color: var(--overlay); font-size: .88rem; }
+    footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .cursor { animation: none; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="wrap">
+      <a class="brand" href="#">config<span>-</span>manager</a>
+      <ul>
+        <li class="hide-sm"><a href="#features">Features</a></li>
+        <li class="hide-sm"><a href="#what">What you get</a></li>
+        <li class="hide-sm"><a href="#how">How it works</a></li>
+        <li><a href="https://github.com/marcos-venicius/config-manager">GitHub</a></li>
+        <li><button class="theme-toggle" id="theme" aria-label="Toggle theme"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main class="wrap">
+    <div class="hero">
+      <div>
+        <span class="eyebrow">Fresh install → ready to code</span>
+        <h1>Rebuild your dev machine with <em>one command</em>.</h1>
+        <p class="lead">
+          config-manager installs your toolchain, links your dotfiles, sets Helix and Alacritty as defaults
+          and applies your desktop preferences. Safe to re-run, and every step is health-checked.
+        </p>
+        <div class="install">
+          <pre id="install-cmd"><span class="p">$ </span>git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager
+<span class="p">$ </span>cd ~/.config-manager &amp;&amp; go install .
+<span class="p">$ </span>sudo ~/go/bin/config-manager install</pre>
+          <button class="copy" id="copy">Copy</button>
+        </div>
+        <div class="cta">
+          <a class="btn primary" href="https://github.com/marcos-venicius/config-manager">★ View on GitHub</a>
+          <a class="btn ghost" href="https://github.com/marcos-venicius/config-manager/blob/main/commands/install-pipeline.go">Read every command it runs</a>
+        </div>
+      </div>
+
+      <div class="term" aria-label="Example installation output">
+        <div class="term-bar"><i></i><i></i><i></i><span>sudo config-manager install -ignore dotnet</span></div>
+        <div class="term-body" id="term"></div>
+      </div>
+    </div>
+
+    <section id="features">
+      <h2>Built for the day you reinstall</h2>
+      <p class="section-lead">No more half-remembered setup notes. Your whole environment is written down as code, reviewed like code, and replayed in minutes.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="icon" style="background: color-mix(in srgb, var(--green) 18%, transparent)">✓</div>
+          <h3>Health-checked &amp; idempotent</h3>
+          <p>Each step checks whether the tool is already installed and skips it if so. Run it again after a failure and it picks up where it stopped.</p>
+        </div>
+        <div class="card">
+          <div class="icon" style="background: color-mix(in srgb, var(--blue) 18%, transparent)">⛓</div>
+          <h3>Dotfiles as symlinks</h3>
+          <p><code>.bashrc</code>, <code>.gitconfig</code>, tmux, Alacritty and Helix configs are linked to the repo. Edit on the machine, commit from the repo.</p>
+        </div>
+        <div class="card">
+          <div class="icon" style="background: color-mix(in srgb, var(--yellow) 18%, transparent)">⤺</div>
+          <h3>Nothing gets lost</h3>
+          <p>Existing files are moved to <code>.bak.&lt;timestamp&gt;</code> before being replaced. Your previous setup is always one <code>mv</code> away.</p>
+        </div>
+        <div class="card">
+          <div class="icon" style="background: color-mix(in srgb, var(--mauve) 18%, transparent)">⊘</div>
+          <h3>Skip what you don't need</h3>
+          <p>Steps are grouped. <code>-ignore desktop,dotnet</code> skips whole groups, so a server or VM gets only what makes sense for it.</p>
+        </div>
+        <div class="card">
+          <div class="icon" style="background: color-mix(in srgb, var(--red) 18%, transparent)">🔒</div>
+          <h3>Secrets stay local</h3>
+          <p>Machine-specific and sensitive settings live in <code>~/.bashrc.local</code>, which is sourced automatically and never committed.</p>
+        </div>
+        <div class="card">
+          <div class="icon" style="background: color-mix(in srgb, var(--sky) 18%, transparent)">🐳</div>
+          <h3>Test it in Docker first</h3>
+          <p>Run <code>make</code> and the whole pipeline runs inside a disposable Ubuntu container. Your system stays untouched.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="what">
+      <h2>What you get</h2>
+      <p class="section-lead">Everything below is installed and configured in order. Each card shows its group, which is the name you pass to <code>-ignore</code>.</p>
+      <div class="groups">
+        <div class="group"><header><strong>Build essentials</strong><span class="tag">base</span></header><p>apt upgrade, curl, wget, gcc, make</p></div>
+        <div class="group"><header><strong>Clang</strong><span class="tag">clang</span></header><p>The C family compiler toolchain</p></div>
+        <div class="group"><header><strong>Git</strong><span class="tag">git</span></header><p>Latest stable from the git-core PPA</p></div>
+        <div class="group"><header><strong>Ripgrep</strong><span class="tag">ripgrep</span></header><p>Fast recursive search</p></div>
+        <div class="group"><header><strong>Clipboard</strong><span class="tag">clipboard</span></header><p>xclip and wl-clipboard: tmux copies on X11 and Wayland</p></div>
+        <div class="group"><header><strong>Tmux</strong><span class="tag">tmux</span></header><p>With vi copy mode and pane navigation</p></div>
+        <div class="group"><header><strong>Rust</strong><span class="tag">cargo</span></header><p>rustup and cargo, used to build Helix and Alacritty</p></div>
+        <div class="group"><header><strong>Helix</strong><span class="tag">helix</span></header><p>Built from source with grammars, set as <code>editor</code> and <code>vi</code>. Every vim/neovim package is removed.</p></div>
+        <div class="group"><header><strong>Alacritty</strong><span class="tag">alacritty</span></header><p>Default terminal everywhere: x-terminal-emulator, xdg, GNOME and COSMIC</p></div>
+        <div class="group"><header><strong>Go</strong><span class="tag">go</span></header><p>Official toolchain in <code>/opt/go</code></p></div>
+        <div class="group"><header><strong>.NET</strong><span class="tag">dotnet</span></header><p>SDK 9.0 via dotnet-install</p></div>
+        <div class="group"><header><strong>Nim</strong><span class="tag">nim</span></header><p>Via choosenim</p></div>
+        <div class="group"><header><strong>kubectl</strong><span class="tag">kubectl</span></header><p>From the official Kubernetes apt repository</p></div>
+        <div class="group"><header><strong>Dotfiles</strong><span class="tag">configs</span></header><p>bash, git, tmux, Alacritty and Helix configs linked into <code>$HOME</code></p></div>
+        <div class="group"><header><strong>GNOME desktop</strong><span class="tag">desktop</span></header><p>Alt+Tab limited to the current workspace, workspaces spanning every monitor, a per-workspace dock</p></div>
+      </div>
+      <div class="ignore-demo">
+        <span>Setting up a headless box?</span>
+        <pre>sudo config-manager install -ignore desktop,alacritty</pre>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2>How it works</h2>
+      <p class="section-lead">A small Go binary that runs a readable list of shell steps. No DSL and no magic, so you can audit it in five minutes.</p>
+      <div class="steps">
+        <div class="step">
+          <h3>Declare the steps</h3>
+          <p>Each step has a label, groups, commands and health checks. Adding a tool takes a few lines.</p>
+          <pre>{
+  label:  "Tmux",
+  groups: []string{"tmux"},
+  commands: []string{"apt-get install tmux -y"},
+  healthCheckCommands: []string{"which tmux"},
+}</pre>
+        </div>
+        <div class="step">
+          <h3>Check before acting</h3>
+          <p>If every health check passes, the step is skipped. Otherwise the commands run, with system steps as root and user steps as you.</p>
+        </div>
+        <div class="step">
+          <h3>Verify after acting</h3>
+          <p>Health checks run again after the commands. If one fails, the pipeline stops and tells you exactly which command failed.</p>
+        </div>
+      </div>
+      <p class="note">
+        <strong>Heads up:</strong> these are one developer's personal configurations for Ubuntu-based systems.
+        Fork the repository and make the pipeline yours, or run <code>make</code> to try it in Docker first.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>config-manager · MIT License · © Marcos Venicius</span>
+      <a href="https://github.com/marcos-venicius/config-manager">github.com/marcos-venicius/config-manager</a>
+    </div>
+  </footer>
+
+  <script>
+    // theme toggle (per-viewer convenience)
+    (function () {
+      var root = document.documentElement;
+      try {
+        var saved = localStorage.getItem("theme");
+        if (saved) root.setAttribute("data-theme", saved);
+      } catch (e) {}
+      document.getElementById("theme").addEventListener("click", function () {
+        var dark = root.getAttribute("data-theme")
+          ? root.getAttribute("data-theme") === "dark"
+          : matchMedia("(prefers-color-scheme: dark)").matches;
+        var next = dark ? "light" : "dark";
+        root.setAttribute("data-theme", next);
+        try { localStorage.setItem("theme", next); } catch (e) {}
+      });
+    })();
+
+    // copy install commands
+    document.getElementById("copy").addEventListener("click", function (ev) {
+      var text = document.getElementById("install-cmd").innerText.replace(/^\$ /gm, "");
+      var btn = ev.currentTarget;
+      var done = function () { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1500); };
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () {});
+    });
+
+    // terminal replay, mirrors the real output format of commands/install.go
+    (function () {
+      var term = document.getElementById("term");
+      var lines = [
+        ['<span class="t-blue">Step 01: APT GET Update</span>', 400],
+        ['  <span class="t-yellow">$</span> apt-get update -y', 250],
+        ['    <span class="t-green">ok</span>', 500],
+        ['', 60],
+        ['<span class="t-blue">Step 06: Ripgrep</span>', 300],
+        ['', 40],
+        ['  <span class="t-sky">Health checks:</span>', 120],
+        ['', 40],
+        ['    <span class="t-yellow">$</span> rg --version', 120],
+        ['      <span class="t-green">ok</span>', 200],
+        ['', 40],
+        ['  <span class="t-sky">Skipping step 06 (Ripgrep). already installed...</span>', 600],
+        ['', 60],
+        ['<span class="t-blue">Step 13: Remove Vim</span>', 300],
+        ['  <span class="t-yellow">$</span> apt-get purge -y vim vim-tiny vim-runtime', 250],
+        ['    <span class="t-dim">Removing vim-tiny ...</span>', 350],
+        ['    <span class="t-green">ok</span>', 300],
+        ['<span class="t-sky">  Health checking...</span>', 150],
+        ['      <span class="t-green">ok</span>', 500],
+        ['', 60],
+        ['<span class="t-blue">Step 17: Helix as default editor</span>', 300],
+        ['  <span class="t-yellow">$</span> update-alternatives --set editor /usr/local/bin/hx', 300],
+        ['    <span class="t-green">ok</span>', 500],
+        ['', 60],
+        ['<span class="t-blue">Step 18 <span class="t-dim">(ignored: dotnet)</span>: Dotnet</span>', 150],
+        ['  <span class="t-dim">Skipping...</span>', 500],
+        ['', 60],
+        ['<span class="t-blue">Step 22: Link configs</span>', 300],
+        ['  <span class="t-yellow">$</span> ln -sfn ~/.config-manager/configs/helix/config.toml ~/.config/helix/config.toml', 300],
+        ['    <span class="t-green">ok</span>', 900]
+      ];
+
+      var reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (reduce) {
+        term.innerHTML = lines.map(function (l) { return l[0]; }).join("\n");
+        return;
+      }
+
+      var i = 0;
+      function tick() {
+        if (i === lines.length) {
+          term.innerHTML += '\n<span class="cursor"></span>';
+          setTimeout(function () { term.innerHTML = ""; i = 0; tick(); }, 3500);
+          return;
+        }
+        term.innerHTML += (i ? "\n" : "") + lines[i][0];
+        term.scrollTop = term.scrollHeight;
+        setTimeout(tick, lines[i++][1]);
+      }
+      tick();
+    })();
+  </script>
+</body>
+</html>
