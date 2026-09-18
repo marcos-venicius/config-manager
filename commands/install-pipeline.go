@@ -249,6 +249,62 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		label:  "Download & Build Tmuxer",
+		groups: []string{"tmuxer"},
+		asHome: true,
+		commands: []string{
+			"mkdir -p $HOME/tools",
+			"[ -d $HOME/tools/tmuxer ] || git clone --depth 1 https://github.com/marcos-venicius/tmuxer.git $HOME/tools/tmuxer",
+			// nimble shells out to a bare `nim`, and this shell does not read .bashrc
+			"cd $HOME/tools/tmuxer && PATH=$HOME/.nimble/bin:$PATH nimble build -d:release -y",
+		},
+		healthCheckCommands: []string{
+			"$HOME/tools/tmuxer/bin/tmuxer -h",
+		},
+	},
+	{
+		// runs as root, so $HOME is not the user's home
+		label:  "Install Tmuxer",
+		groups: []string{"tmuxer"},
+		commands: []string{
+			"ln -sf \"$(getent passwd \"$SUDO_USER\" | cut -d: -f6)/tools/tmuxer/bin/tmuxer\" /usr/local/bin/tmuxer",
+		},
+		healthCheckCommands: []string{
+			"[ \"$(readlink /usr/local/bin/tmuxer)\" = \"$HOME/tools/tmuxer/bin/tmuxer\" ]",
+			"tmuxer -h",
+		},
+	},
+	{
+		// mark renders into a native WebKitGTK window
+		label:  "Mark dependencies",
+		groups: []string{"mark"},
+		commands: []string{
+			"apt-get install pkg-config libwebkit2gtk-4.1-dev libsoup-3.0-dev -y",
+		},
+		healthCheckCommands: []string{
+			// the .pc files are what the build actually looks for; on the first
+			// run pkg-config itself is missing, which fails the check and runs the step
+			"pkg-config --exists webkit2gtk-4.1",
+			"pkg-config --exists libsoup-3.0",
+		},
+	},
+	{
+		label:  "Download & Install Mark",
+		groups: []string{"mark"},
+		asHome: true,
+		commands: []string{
+			"mkdir -p $HOME/tools",
+			"[ -d $HOME/tools/mark ] || git clone --depth 1 https://github.com/marcos-venicius/mark.git $HOME/tools/mark",
+			// install.sh builds, installs to ~/.local/bin and registers the icon,
+			// desktop entry and .md MIME type; it calls a bare `cargo`
+			"cd $HOME/tools/mark && PATH=$HOME/.cargo/bin:$PATH ./install.sh",
+		},
+		healthCheckCommands: []string{
+			"$HOME/.local/bin/mark --version",
+			"[ -s $HOME/.local/share/applications/mark.desktop ]",
+		},
+	},
+	{
 		// alacritty installation dependency
 		label:  "Font config",
 		groups: []string{"alacritty"},

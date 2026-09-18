@@ -8,6 +8,8 @@
 This is my tools config manager. It provides configuration for:
 
 - Tmux
+- Tmuxer (my tmux session setup tool, built from source)
+- Mark (my markdown viewer, registered as the default `.md` handler)
 - Alacritty (default terminal: GNOME, COSMIC, x-terminal-emulator and xdg default apps)
 - Helix (default editor, every vim/neovim package is removed)
 - Git config
