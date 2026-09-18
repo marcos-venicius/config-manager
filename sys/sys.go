@@ -52,6 +52,11 @@ func Command() SysCmd {
 	}
 }
 
+// HomeDir is the home of the user behind the sudo, not root's
+func (s SysCmd) HomeDir() string {
+	return s.homeDir
+}
+
 func (s SysCmd) newHomeCmd(command string) *exec.Cmd {
 	cmd := exec.Command("bash", "-c", command)
 

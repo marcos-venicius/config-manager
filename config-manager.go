@@ -17,11 +17,11 @@ func main() {
 	case "version":
 		fmt.Println(VERSION)
 	case "install":
-		commands.Install(args.ignore)
+		commands.Install(args.ignore, args.only)
 	case "update":
-		commands.Update(args.ignore)
+		commands.Update(args.ignore, args.only)
 	case "uninstall":
-		commands.Uninstall(args.ignore)
+		commands.Uninstall(args.ignore, args.only)
 	case "list":
 		commands.List()
 	case "help":

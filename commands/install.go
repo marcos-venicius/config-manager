@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"slices"
 	"strings"
 
@@ -38,6 +39,10 @@ type mode_t struct {
 	skipWhenUnhealthy bool
 	// install and update: health checks run again afterwards and a failure aborts
 	verifyAfter bool
+	// install only: -only grows into the groups the named ones are built on. update and
+	// uninstall act on what is already installed, so there they run exactly what is named
+	// and uninstalling one group never drags its dependencies out with it
+	expandSelection bool
 	// uninstall undoes the pipeline, so it walks it backwards
 	reverse bool
 }
@@ -47,6 +52,7 @@ var (
 		name:            "install",
 		commandsOf:      func(step step_t) []string { return step.commands },
 		skipWhenHealthy: true,
+		expandSelection: true,
 		verifyAfter:     true,
 	}
 
@@ -152,10 +158,17 @@ func ignoredReason(step step_t, cause map[string]string) (string, bool) {
 	return "", false
 }
 
-func validate(ignore []string) {
+func validate(ignore, only []string) {
 	groups := Groups()
 
-	for _, group := range ignore {
+	// -only is an allow list and -ignore a deny list; honouring both at once would
+	// mean guessing which one the user meant for a group named in neither
+	if len(ignore) > 0 && len(only) > 0 {
+		fmt.Println("fatal: -only and -ignore cannot be used together")
+		os.Exit(1)
+	}
+
+	for _, group := range append(append([]string{}, ignore...), only...) {
 		if !slices.Contains(groups, group) {
 			fmt.Printf("fatal: unknown group '%s'. available groups: %s\n", group, strings.Join(groups, ", "))
 			os.Exit(1)
@@ -183,11 +196,101 @@ func healthy(baseCmd sys.SysCmd, step step_t) bool {
 	return true
 }
 
-func Install(ignore []string) { runPipeline(installMode, ignore) }
+// implicitGroup is pulled into every -only run. It brings the apt index, curl, wget and
+// build-essential, which every other group assumes without saying so.
+const implicitGroup = "base"
 
-func Update(ignore []string) { runPipeline(updateMode, ignore) }
+// expandSelected grows an -only list with everything the named groups need, transitively,
+// so asking for one group does not require knowing what it is built on. The value is the
+// group that pulled each one in, and equals the key for the ones named on the command line.
+func expandSelected(only []string, expand bool) map[string]string {
+	chosen := map[string]string{}
+	pending := []string{}
 
-func Uninstall(ignore []string) { runPipeline(uninstallMode, ignore) }
+	for _, group := range only {
+		if _, ok := chosen[group]; !ok {
+			chosen[group] = group
+			pending = append(pending, group)
+		}
+	}
+
+	if !expand {
+		return chosen
+	}
+
+	if _, ok := chosen[implicitGroup]; !ok {
+		chosen[implicitGroup] = implicitGroup
+		pending = append(pending, implicitGroup)
+	}
+
+	requires := groupRequires()
+
+	for len(pending) > 0 {
+		group := pending[0]
+		pending = pending[1:]
+
+		for _, dependency := range requires[group] {
+			if _, ok := chosen[dependency]; !ok {
+				chosen[dependency] = group
+				pending = append(pending, dependency)
+			}
+		}
+	}
+
+	return chosen
+}
+
+// pulledIn lists the groups a selection gained on top of what was asked for, in pipeline order
+func pulledIn(only []string, chosen map[string]string) []string {
+	added := []string{}
+
+	for _, group := range Groups() {
+		if _, ok := chosen[group]; ok && !slices.Contains(only, group) {
+			added = append(added, group)
+		}
+	}
+
+	return added
+}
+
+// groupRuns reports whether any step of a group is going to run under this selection
+func groupRuns(group string, cause map[string]string, chosen map[string]string, only []string) bool {
+	for _, step := range allSteps() {
+		if step.disabled || !slices.Contains(step.groups, group) {
+			continue
+		}
+
+		if len(only) > 0 {
+			if isSelected(step, chosen) {
+				return true
+			}
+
+			continue
+		}
+
+		if _, skipped := ignoredReason(step, cause); !skipped {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isSelected(step step_t, chosen map[string]string) bool {
+	for _, group := range step.groups {
+		if _, ok := chosen[group]; ok {
+			return true
+		}
+	}
+
+	return false
+}
+
+func Install(ignore, only []string) { runPipeline(installMode, ignore, only) }
+
+func Update(ignore, only []string) { runPipeline(updateMode, ignore, only) }
+
+func Uninstall(ignore, only []string) { runPipeline(uninstallMode, ignore, only) }
 
 // List prints the pipeline without touching the system
 func List() {
@@ -220,8 +323,8 @@ func List() {
 	}
 }
 
-func runPipeline(mode mode_t, ignore []string) {
-	validate(ignore)
+func runPipeline(mode mode_t, ignore, only []string) {
+	validate(ignore, only)
 
 	steps := allSteps()
 	total := len(steps)
@@ -236,7 +339,27 @@ func runPipeline(mode mode_t, ignore []string) {
 	}
 
 	cause := expandIgnored(ignore)
+	chosen := expandSelected(only, mode.expandSelection)
+
+	if len(only) > 0 {
+		if added := pulledIn(only, chosen); len(added) > 0 {
+			fmt.Printf("\033[0;36m-only %s also runs what it needs: %s\033[0m\n\n", strings.Join(only, ","), strings.Join(added, ", "))
+		}
+	}
+
 	baseCmd := sys.Command()
+
+	// checked up front: finding this out from a failing `test -e` after the pipeline has
+	// already spent twenty minutes building helix is not a useful way to learn it
+	if groupRuns(configsGroup, cause, chosen, only) {
+		if dir, ok := resolveConfigsDir(baseCmd.HomeDir()); !ok {
+			fmt.Printf("fatal: no configs directory found at '%s'\n", filepath.Join(dir, "configs"))
+			fmt.Printf("       run %s from the repository, or point CONFIG_MANAGER_DIR at it:\n", mode.name)
+			fmt.Printf("       sudo CONFIG_MANAGER_DIR=/path/to/config-manager config-manager %s\n", mode.name)
+			os.Exit(1)
+		}
+	}
+
 	ran := 0
 
 	for _, index := range order {
@@ -261,7 +384,13 @@ func runPipeline(mode mode_t, ignore []string) {
 			continue
 		}
 
-		if reason, ok := ignoredReason(step, cause); ok {
+		if len(only) > 0 {
+			if !isSelected(step, chosen) {
+				fmt.Printf("\033[0;34m%s \033[2;36m(not selected)\033[0;34m: %s\033[0m\n", position, step.label)
+				fmt.Printf("  \033[2;36mSkipping...\033[0m\n")
+				continue
+			}
+		} else if reason, ok := ignoredReason(step, cause); ok {
 			fmt.Printf("\033[0;34m%s \033[2;36m(ignored: %s)\033[0;34m: %s\033[0m\n", position, reason, step.label)
 			fmt.Printf("  \033[2;36mSkipping...\033[0m\n")
 			continue

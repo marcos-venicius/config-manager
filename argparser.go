@@ -14,6 +14,7 @@ type arguments_t struct {
 	command string
 
 	ignore []string
+	only   []string
 }
 
 func CreateArgumentsParser() *arguments_t {
@@ -49,8 +50,13 @@ func (a *arguments_t) Parse() *arguments_t {
 			break
 		}
 
-		if value, ok := strings.CutPrefix(strings.TrimPrefix(arg, "-"), "-ignore="); ok {
-			a.addIgnored(value)
+		if value, ok := cutFlag(arg, "ignore"); ok {
+			a.ignore = appendGroups(a.ignore, value)
+			continue
+		}
+
+		if value, ok := cutFlag(arg, "only"); ok {
+			a.only = appendGroups(a.only, value)
 			continue
 		}
 
@@ -63,7 +69,16 @@ func (a *arguments_t) Parse() *arguments_t {
 				os.Exit(1)
 			}
 
-			a.addIgnored(value)
+			a.ignore = appendGroups(a.ignore, value)
+		case "-only", "--only":
+			value, ok := shift()
+
+			if !ok {
+				fmt.Printf("fatal: %s expects a comma separated list of groups\n", arg)
+				os.Exit(1)
+			}
+
+			a.only = appendGroups(a.only, value)
 		case "install", "update", "uninstall", "list", "version", "help":
 			a.command = arg
 		}
@@ -77,12 +92,25 @@ func (a *arguments_t) Parse() *arguments_t {
 	return a
 }
 
-func (a *arguments_t) addIgnored(value string) {
-	for _, group := range strings.Split(value, ",") {
-		if group = strings.TrimSpace(group); group != "" {
-			a.ignore = append(a.ignore, group)
+// cutFlag matches both "-name=value" and "--name=value"
+func cutFlag(arg, name string) (string, bool) {
+	for _, prefix := range []string{"-" + name + "=", "--" + name + "="} {
+		if value, ok := strings.CutPrefix(arg, prefix); ok {
+			return value, true
 		}
 	}
+
+	return "", false
+}
+
+func appendGroups(groups []string, value string) []string {
+	for _, group := range strings.Split(value, ",") {
+		if group = strings.TrimSpace(group); group != "" {
+			groups = append(groups, group)
+		}
+	}
+
+	return groups
 }
 
 func (a *arguments_t) Help() {
@@ -100,5 +128,10 @@ func (a *arguments_t) Help() {
 	fmt.Printf("Options:\n")
 	fmt.Printf("  -ignore <groups>  comma separated list of step groups to skip\n")
 	fmt.Printf("                    ignoring a group also skips every group that needs it\n")
-	fmt.Printf("                    groups: %s\n", strings.Join(commands.Groups(), ", "))
+	fmt.Printf("  -only <groups>    comma separated list of step groups to run, skipping the rest\n")
+	fmt.Printf("                    install also runs whatever those groups need, so you do not\n")
+	fmt.Printf("                    have to know their dependencies. update and uninstall run\n")
+	fmt.Printf("                    exactly what you name. cannot be combined with -ignore\n")
+	fmt.Printf("\n")
+	fmt.Printf("  groups: %s\n", strings.Join(commands.Groups(), ", "))
 }

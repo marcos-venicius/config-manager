@@ -251,6 +251,7 @@
         <div class="group"><header><strong>Ripgrep</strong><span class="tag">ripgrep</span></header><p>Fast recursive search</p></div>
         <div class="group"><header><strong>Clipboard</strong><span class="tag">clipboard</span></header><p>xclip and wl-clipboard: tmux copies on X11 and Wayland</p></div>
         <div class="group"><header><strong>Tmux</strong><span class="tag">tmux</span></header><p>With vi copy mode and pane navigation</p></div>
+        <div class="group"><header><strong>Tmux plugins</strong><span class="tag">tpm</span></header><p>tpm plus Catppuccin, resurrect and continuum, installed without opening tmux</p></div>
         <div class="group"><header><strong>Rust</strong><span class="tag">cargo</span></header><p>rustup and cargo, used to build Helix and Alacritty</p></div>
         <div class="group"><header><strong>Helix</strong><span class="tag">helix</span></header><p>Built from source with grammars, set as <code>editor</code> and <code>vi</code>. Every vim/neovim package is removed.</p></div>
         <div class="group"><header><strong>Alacritty</strong><span class="tag">alacritty</span></header><p>Default terminal everywhere: x-terminal-emulator, xdg, GNOME and COSMIC</p></div>
@@ -288,13 +289,16 @@
             <div class="bind"><span><kbd>prefix L</kbd></span><em>Back to the last window</em></div>
             <div class="bind"><span><kbd>prefix r</kbd></span><em>Reload the config in place</em></div>
             <div class="bind"><span><kbd>y</kbd></span><em>In copy mode: to the system clipboard, <code>wl-copy</code> on Wayland and <code>xclip</code> on X11</em></div>
+            <div class="bind"><span><kbd>prefix I</kbd></span><em>Install any plugin added to the config</em></div>
+            <div class="bind"><span><kbd>prefix U</kbd></span><em>Update the installed plugins</em></div>
           </div>
           <ul class="bullets">
             <li>vi keys in copy mode, mouse on, 10 000 lines of scrollback</li>
             <li>Bells, activity warnings and visual noise all off</li>
             <li><code>escape-time 0</code>, so <kbd>Esc</kbd> is never swallowed on its way to the editor</li>
             <li>Windows keep the name you gave them (<code>allow-rename off</code>)</li>
-            <li>Catppuccin Mocha status bar with the date and a ticking clock</li>
+            <li>Catppuccin Mocha through <code>catppuccin/tmux</code>, with the date and clock on the right</li>
+            <li>Sessions, windows and pane contents come back after a reboot, saved every 15 minutes by <code>tmux-resurrect</code> and <code>tmux-continuum</code></li>
           </ul>
         </div>
 
@@ -453,14 +457,14 @@ $ <span class="t-dim">█</span></div>
         ['<span class="t-sky">  Health checking...</span>', 150],
         ['      <span class="t-green">ok</span>', 500],
         ['', 60],
-        ['<span class="t-blue">Step 17/32: Helix as default editor</span>', 300],
+        ['<span class="t-blue">Step 17/33: Helix as default editor</span>', 300],
         ['  <span class="t-yellow">$</span> update-alternatives --set editor /usr/local/bin/hx', 300],
         ['    <span class="t-green">ok</span>', 500],
         ['', 60],
-        ['<span class="t-blue">Step 18/32 <span class="t-dim">(ignored: dotnet)</span>: Dotnet</span>', 150],
+        ['<span class="t-blue">Step 18/33 <span class="t-dim">(ignored: dotnet)</span>: Dotnet</span>', 150],
         ['  <span class="t-dim">Skipping...</span>', 500],
         ['', 60],
-        ['<span class="t-blue">Step 27/32: Link configs</span>', 300],
+        ['<span class="t-blue">Step 27/33: Link configs</span>', 300],
         ['  <span class="t-yellow">$</span> ln -sfn ~/.config-manager/configs/helix/config.toml ~/.config/helix/config.toml', 300],
         ['    <span class="t-green">ok</span>', 900]
       ];

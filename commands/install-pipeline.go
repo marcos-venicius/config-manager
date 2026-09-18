@@ -1,6 +1,10 @@
 package commands
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+)
 
 var installationSteps = []step_t{
 	{
@@ -379,6 +383,33 @@ var installationSteps = []step_t{
 	},
 	// keep it after every installer that may touch the dotfiles
 	linkConfigsStep(),
+	{
+		// has to run after the configs are linked: install_plugins reads the @plugin
+		// lines out of ~/.tmux.conf, so without the symlink it finds nothing to do
+		label:    "Tmux Plugin Manager",
+		groups:   []string{"tpm"},
+		requires: []string{"tmux", "configs", "git"},
+		asHome:   true,
+		commands: []string{
+			"mkdir -p $HOME/.tmux/plugins",
+			"[ -d $HOME/.tmux/plugins/tpm ] || git clone --depth 1 https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm",
+			"$HOME/.tmux/plugins/tpm/bin/install_plugins",
+		},
+		healthCheckCommands: []string{
+			"[ -x $HOME/.tmux/plugins/tpm/tpm ]",
+			// tpm names the directory after the repository, so catppuccin/tmux lands on "tmux"
+			"[ -d $HOME/.tmux/plugins/tmux ]",
+			"[ -d $HOME/.tmux/plugins/tmux-resurrect ]",
+			"[ -d $HOME/.tmux/plugins/tmux-continuum ]",
+		},
+		updateCommands: []string{
+			"cd $HOME/.tmux/plugins/tpm && git pull --ff-only",
+			"$HOME/.tmux/plugins/tpm/bin/update_plugins all",
+		},
+		uninstallCommands: []string{
+			"rm -rf $HOME/.tmux/plugins",
+		},
+	},
 	// alacritty installation is too slow, keep it (and its defaults) at the end
 	{
 		label:    "Alacritty",
@@ -446,8 +477,38 @@ var installationSteps = []step_t{
 	},
 }
 
-// repository root; defaults to the clone location described in the README
+// repository root; defaults to the clone location described in the README.
+// resolveConfigsDir fills CONFIG_MANAGER_DIR in before any step runs, so this
+// expansion only falls back when the repository really is at the default path.
 const configManagerDir = "${CONFIG_MANAGER_DIR:-$HOME/.config-manager}"
+
+const configsGroup = "configs"
+
+func hasConfigs(dir string) bool {
+	info, err := os.Stat(filepath.Join(dir, "configs"))
+
+	return err == nil && info.IsDir()
+}
+
+// resolveConfigsDir finds the repository the dotfiles are linked from. Without it, a clone
+// living anywhere other than ~/.config-manager fails on the `test -e` of the link step,
+// twenty minutes into a run, with an error that says nothing about the cause.
+func resolveConfigsDir(homeDir string) (string, bool) {
+	if dir := os.Getenv("CONFIG_MANAGER_DIR"); dir != "" {
+		return dir, hasConfigs(dir)
+	}
+
+	// being run out of a clone, which is how the README says to test it
+	if cwd, err := os.Getwd(); err == nil && hasConfigs(cwd) {
+		os.Setenv("CONFIG_MANAGER_DIR", cwd)
+
+		return cwd, true
+	}
+
+	fallback := filepath.Join(homeDir, ".config-manager")
+
+	return fallback, hasConfigs(fallback)
+}
 
 // linkConfig symlinks configs/<src> to dst, moving any existing non-symlink dst to dst.bak.<timestamp>.
 // unlink only removes dst when it still points at this repository, so a link the user

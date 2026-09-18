@@ -7,7 +7,7 @@
 
 This is my tools config manager. It provides configuration for:
 
-- Tmux
+- Tmux (with tpm: Catppuccin, resurrect and continuum)
 - Tmuxer (my tmux session setup tool, built from source)
 - Mark (my markdown viewer, registered as the default `.md` handler)
 - Claude Code (native install, keeps itself updated)
@@ -63,8 +63,34 @@ also skips everything that depends on it, transitively. Ignoring `cargo` therefo
 `alacritty` and `mark` as well, and the output says why:
 
 ```
-Step 14/32 (ignored: helix needs cargo): Download & Build Helix
+Step 14/33 (ignored: helix needs cargo): Download & Build Helix
 ```
+
+## Running a single group
+
+`-only` is the inverse: it runs the groups you name and skips everything else.
+
+```bash
+sudo config-manager install   -only claude
+sudo config-manager update    -only tmuxer
+sudo config-manager uninstall -only mark
+```
+
+`install` pulls in whatever the named groups are built on, transitively, so you do not have to
+know the graph. `base` always comes along, since every group assumes apt, curl and build-essential.
+It tells you what it added:
+
+```
+$ sudo config-manager install -only tpm
+-only tpm also runs what it needs: base, git, tmux, configs
+```
+
+Anything already in place is skipped by its health checks, so the extra groups usually cost seconds.
+
+`update` and `uninstall` do **not** expand: they run exactly the groups you name. Uninstalling
+`tpm` should not drag your dotfile symlinks out with it.
+
+`-only` cannot be combined with `-ignore`.
 
 ## Desktop (GNOME)
 
@@ -83,11 +109,22 @@ The files inside [configs](./configs) are **symlinked** into your home (`~/.bash
 
 If a regular file/folder already exists in the destination, it is moved to `<name>.bak.<timestamp>` first.
 
-The repository is expected at `~/.config-manager`. Use `CONFIG_MANAGER_DIR` to point somewhere else:
+The repository is found in this order: `CONFIG_MANAGER_DIR` if you set it, then the directory you
+are running from if it has a `configs/`, then `~/.config-manager`. So running it out of a clone
+works wherever the clone lives:
 
 ```bash
-sudo CONFIG_MANAGER_DIR=$PWD config-manager install
+cd ~/tools/config-manager && sudo ./config-manager install
 ```
+
+Set `CONFIG_MANAGER_DIR` when the binary is installed elsewhere and you are not in the clone:
+
+```bash
+sudo CONFIG_MANAGER_DIR=~/tools/config-manager config-manager install
+```
+
+If none of the three resolves, it says so and exits before running a single step, rather than
+failing on the link step twenty minutes in.
 
 Machine-specific or sensitive settings (passwords, work paths, `KUBECONFIG`, ...) must go in `~/.bashrc.local`,
 which is sourced by `.bashrc` and is **not** versioned.
