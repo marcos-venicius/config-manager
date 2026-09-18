@@ -142,6 +142,28 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		// the picker of tmux-claude-hatch
+		label:  "Fzf",
+		groups: []string{"fzf"},
+		commands: []string{
+			"apt-get install fzf -y",
+		},
+		healthCheckCommands: []string{
+			"which fzf",
+		},
+	},
+	{
+		// tmux-claude-hatch parses the json of `claude agents` with it
+		label:  "Jq",
+		groups: []string{"jq"},
+		commands: []string{
+			"apt-get install jq -y",
+		},
+		healthCheckCommands: []string{
+			"which jq",
+		},
+	},
+	{
 		// helix is the only editor: purge any vim/neovim package and leftovers from the old neovim step
 		label:  "Remove Vim",
 		groups: []string{"helix"},
@@ -388,7 +410,7 @@ var installationSteps = []step_t{
 		// lines out of ~/.tmux.conf, so without the symlink it finds nothing to do
 		label:    "Tmux Plugin Manager",
 		groups:   []string{"tpm"},
-		requires: []string{"tmux", "configs", "git"},
+		requires: []string{"tmux", "configs", "git", "fzf", "jq"},
 		asHome:   true,
 		commands: []string{
 			"mkdir -p $HOME/.tmux/plugins",
@@ -399,8 +421,7 @@ var installationSteps = []step_t{
 			"[ -x $HOME/.tmux/plugins/tpm/tpm ]",
 			// tpm names the directory after the repository, so catppuccin/tmux lands on "tmux"
 			"[ -d $HOME/.tmux/plugins/tmux ]",
-			"[ -d $HOME/.tmux/plugins/tmux-resurrect ]",
-			"[ -d $HOME/.tmux/plugins/tmux-continuum ]",
+			"[ -d $HOME/.tmux/plugins/tmux-claude-hatch ]",
 		},
 		updateCommands: []string{
 			"cd $HOME/.tmux/plugins/tpm && git pull --ff-only",
@@ -408,6 +429,52 @@ var installationSteps = []step_t{
 		},
 		uninstallCommands: []string{
 			"rm -rf $HOME/.tmux/plugins",
+		},
+	},
+	{
+		// the claude side of tmux-claude-hatch: forwards the bell and refreshes the
+		// session list cache from claude hooks. The tmux side is installed by tpm above
+		label:    "Claude Hatch plugin",
+		groups:   []string{"claude-hatch"},
+		requires: []string{"claude", "jq"},
+		asHome:   true,
+		commands: []string{
+			"PATH=$HOME/.local/bin:$PATH; claude plugin marketplace list | grep -q tmux-claude-hatch || claude plugin marketplace add craftzdog/tmux-claude-hatch",
+			"PATH=$HOME/.local/bin:$PATH claude plugin install tmux-claude-hatch@tmux-claude-hatch",
+		},
+		healthCheckCommands: []string{
+			"PATH=$HOME/.local/bin:$PATH claude plugin list --json | jq -e 'any(.[]; .id == \"tmux-claude-hatch@tmux-claude-hatch\")'",
+		},
+		updateCommands: []string{
+			"PATH=$HOME/.local/bin:$PATH claude plugin marketplace update tmux-claude-hatch",
+			"PATH=$HOME/.local/bin:$PATH claude plugin update tmux-claude-hatch@tmux-claude-hatch",
+		},
+		uninstallCommands: []string{
+			"PATH=$HOME/.local/bin:$PATH claude plugin uninstall tmux-claude-hatch@tmux-claude-hatch",
+			"PATH=$HOME/.local/bin:$PATH claude plugin marketplace remove tmux-claude-hatch",
+		},
+	},
+	{
+		// makes claude ring a real bell (\a) as soon as a turn ends, which tmux-claude-hatch
+		// forwards. messageIdleNotifThresholdMs is only read from ~/.claude.json, settings.json
+		// drops it. jq only touches that key, and writing through the shell instead of mv keeps
+		// the file's permissions and symlink; an invalid file makes jq fail before the write
+		label:    "Claude bell notifications",
+		groups:   []string{"claude-hatch"},
+		requires: []string{"claude", "jq"},
+		asHome:   true,
+		commands: []string{
+			`mkdir -p $HOME/.claude && touch $HOME/.claude.json && chmod 600 $HOME/.claude.json`,
+			`f=$HOME/.claude/settings.json; [ -s $f ] || echo '{}' > $f; json=$(jq '.preferredNotifChannel = "terminal_bell"' $f) && echo "$json" > $f`,
+			`f=$HOME/.claude.json; [ -s $f ] || echo '{}' > $f; json=$(jq '.messageIdleNotifThresholdMs = 0' $f) && echo "$json" > $f`,
+		},
+		healthCheckCommands: []string{
+			`jq -e '.preferredNotifChannel == "terminal_bell"' $HOME/.claude/settings.json`,
+			`jq -e '.messageIdleNotifThresholdMs == 0' $HOME/.claude.json`,
+		},
+		uninstallCommands: []string{
+			`f=$HOME/.claude/settings.json; json=$(jq 'del(.preferredNotifChannel)' $f) && echo "$json" > $f`,
+			`f=$HOME/.claude.json; json=$(jq 'del(.messageIdleNotifThresholdMs)' $f) && echo "$json" > $f`,
 		},
 	},
 	// alacritty installation is too slow, keep it (and its defaults) at the end

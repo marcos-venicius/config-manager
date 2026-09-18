@@ -7,10 +7,10 @@
 
 This is my tools config manager. It provides configuration for:
 
-- Tmux (with tpm: Catppuccin, resurrect and continuum)
+- Tmux (with tpm: Catppuccin and claude-hatch, plus its fzf and jq)
 - Tmuxer (my tmux session setup tool, built from source)
 - Mark (my markdown viewer, registered as the default `.md` handler)
-- Claude Code (native install, keeps itself updated)
+- Claude Code (native install, keeps itself updated, plus the tmux-claude-hatch plugin and a terminal bell as soon as a turn ends)
 - Alacritty (default terminal: GNOME, COSMIC, x-terminal-emulator and xdg default apps)
 - Helix (default editor, every vim/neovim package is removed)
 - Git config
@@ -63,7 +63,7 @@ also skips everything that depends on it, transitively. Ignoring `cargo` therefo
 `alacritty` and `mark` as well, and the output says why:
 
 ```
-Step 14/33 (ignored: helix needs cargo): Download & Build Helix
+Step 16/36 (ignored: helix needs cargo): Download & Build Helix
 ```
 
 ## Running a single group
@@ -82,7 +82,7 @@ It tells you what it added:
 
 ```
 $ sudo config-manager install -only tpm
--only tpm also runs what it needs: base, git, tmux, configs
+-only tpm also runs what it needs: base, git, tmux, fzf, jq, configs
 ```
 
 Anything already in place is skipped by its health checks, so the extra groups usually cost seconds.

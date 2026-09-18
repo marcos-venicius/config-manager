@@ -251,7 +251,7 @@
         <div class="group"><header><strong>Ripgrep</strong><span class="tag">ripgrep</span></header><p>Fast recursive search</p></div>
         <div class="group"><header><strong>Clipboard</strong><span class="tag">clipboard</span></header><p>xclip and wl-clipboard: tmux copies on X11 and Wayland</p></div>
         <div class="group"><header><strong>Tmux</strong><span class="tag">tmux</span></header><p>With vi copy mode and pane navigation</p></div>
-        <div class="group"><header><strong>Tmux plugins</strong><span class="tag">tpm</span></header><p>tpm plus Catppuccin, resurrect and continuum, installed without opening tmux</p></div>
+        <div class="group"><header><strong>Tmux plugins</strong><span class="tag">tpm</span></header><p>tpm plus Catppuccin and claude-hatch (with fzf and jq), installed without opening tmux</p></div>
         <div class="group"><header><strong>Rust</strong><span class="tag">cargo</span></header><p>rustup and cargo, used to build Helix and Alacritty</p></div>
         <div class="group"><header><strong>Helix</strong><span class="tag">helix</span></header><p>Built from source with grammars, set as <code>editor</code> and <code>vi</code>. Every vim/neovim package is removed.</p></div>
         <div class="group"><header><strong>Alacritty</strong><span class="tag">alacritty</span></header><p>Default terminal everywhere: x-terminal-emulator, xdg, GNOME and COSMIC</p></div>
@@ -261,6 +261,7 @@
         <div class="group"><header><strong>Tmuxer</strong><span class="tag">tmuxer</span></header><p>My tmux session setup tool, built from source</p></div>
         <div class="group"><header><strong>Mark</strong><span class="tag">mark</span></header><p>My Markdown viewer, registered as the default <code>.md</code> handler</p></div>
         <div class="group"><header><strong>Claude Code</strong><span class="tag">claude</span></header><p>The native install into <code>~/.local/bin</code>, which keeps itself updated</p></div>
+        <div class="group"><header><strong>Claude Hatch</strong><span class="tag">claude-hatch</span></header><p>The Claude Code side of tmux-claude-hatch: bell forwarding and session cache refresh, plus <code>preferredNotifChannel</code> and <code>messageIdleNotifThresholdMs</code> merged into your existing Claude settings so the bell rings as soon as a turn ends</p></div>
         <div class="group"><header><strong>kubectl</strong><span class="tag">kubectl</span></header><p>From the official Kubernetes apt repository</p></div>
         <div class="group"><header><strong>Dotfiles</strong><span class="tag">configs</span></header><p>bash, git, tmux, Alacritty and Helix configs linked into <code>$HOME</code></p></div>
         <div class="group"><header><strong>GNOME desktop</strong><span class="tag">desktop</span></header><p>Alt+Tab limited to the current workspace, workspaces spanning every monitor, a per-workspace dock</p></div>
@@ -298,7 +299,6 @@
             <li><code>escape-time 0</code>, so <kbd>Esc</kbd> is never swallowed on its way to the editor</li>
             <li>Windows keep the name you gave them (<code>allow-rename off</code>)</li>
             <li>Catppuccin Mocha through <code>catppuccin/tmux</code>, with the date and clock on the right</li>
-            <li>Sessions, windows and pane contents come back after a reboot, saved every 15 minutes by <code>tmux-resurrect</code> and <code>tmux-continuum</code></li>
           </ul>
         </div>
 
