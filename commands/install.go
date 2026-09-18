@@ -12,15 +12,59 @@ import (
 type step_t struct {
 	label               string
 	groups              []string // used by `-ignore`; a step is skipped when any of its groups is ignored
+	requires            []string // groups this step needs; ignoring one of them skips this step too
 	asHome              bool     // do not run commands as sudo
 	disabled            bool
 	commands            []string
 	healthCheckCommands []string
+	updateCommands      []string // `update`: refresh a step already installed, for the ones built from source
+	uninstallCommands   []string // `uninstall`: undo what this step created, best effort
 }
 
 func allSteps() []step_t {
 	return append(append([]step_t{}, installationSteps...), desktopSteps...)
 }
+
+// mode_t is what changes between install, update and uninstall: which commands to run,
+// and what the health checks mean for them
+type mode_t struct {
+	name string
+
+	commandsOf func(step_t) []string
+
+	// install only: a step whose health checks already pass has nothing to do
+	skipWhenHealthy bool
+	// update only: a step that was never installed is not this command's job
+	skipWhenUnhealthy bool
+	// install and update: health checks run again afterwards and a failure aborts
+	verifyAfter bool
+	// uninstall undoes the pipeline, so it walks it backwards
+	reverse bool
+}
+
+var (
+	installMode = mode_t{
+		name:            "install",
+		commandsOf:      func(step step_t) []string { return step.commands },
+		skipWhenHealthy: true,
+		verifyAfter:     true,
+	}
+
+	updateMode = mode_t{
+		name:              "update",
+		commandsOf:        func(step step_t) []string { return step.updateCommands },
+		skipWhenUnhealthy: true,
+		verifyAfter:       true,
+	}
+
+	// nothing is verified here: after an uninstall the health checks are meant to fail,
+	// and a command that has nothing left to remove is not an error either
+	uninstallMode = mode_t{
+		name:       "uninstall",
+		commandsOf: func(step step_t) []string { return step.uninstallCommands },
+		reverse:    true,
+	}
+)
 
 // Groups returns every known step group, in pipeline order
 func Groups() []string {
@@ -39,69 +83,223 @@ func Groups() []string {
 	return groups
 }
 
-func ignoredGroup(step step_t, ignore []string) (string, bool) {
+// groupRequires maps every group to the groups its steps depend on
+func groupRequires() map[string][]string {
+	requires := map[string][]string{}
+
+	for _, step := range allSteps() {
+		for _, group := range step.groups {
+			requires[group] = append(requires[group], step.requires...)
+		}
+	}
+
+	return requires
+}
+
+// expandIgnored grows the ignore list with every group that depends, directly or
+// transitively, on an ignored one. The value is the ignored group that caused it,
+// which is the group itself when it was ignored explicitly.
+func expandIgnored(ignore []string) map[string]string {
+	cause := map[string]string{}
+
+	for _, group := range ignore {
+		cause[group] = group
+	}
+
+	requires := groupRequires()
+
+	for changed := true; changed; {
+		changed = false
+
+		for group, needed := range requires {
+			if _, ignored := cause[group]; ignored {
+				continue
+			}
+
+			for _, dependency := range needed {
+				if _, ignored := cause[dependency]; ignored {
+					cause[group] = dependency
+					changed = true
+					break
+				}
+			}
+		}
+	}
+
+	return cause
+}
+
+// ignoredReason explains, for the step header, why a step is being skipped
+func ignoredReason(step step_t, cause map[string]string) (string, bool) {
+	// one of the step's own groups was ignored, either by hand or through a dependency
 	for _, group := range step.groups {
-		if slices.Contains(ignore, group) {
-			return group, true
+		if root, ignored := cause[group]; ignored {
+			if root == group {
+				return group, true
+			}
+
+			return fmt.Sprintf("%s needs %s", group, root), true
+		}
+	}
+
+	// the step itself depends on something that is ignored
+	for _, group := range step.requires {
+		if _, ignored := cause[group]; ignored {
+			return fmt.Sprintf("needs %s", group), true
 		}
 	}
 
 	return "", false
 }
 
-func Install(ignore []string) {
+func validate(ignore []string) {
+	groups := Groups()
+
 	for _, group := range ignore {
-		if !slices.Contains(Groups(), group) {
-			fmt.Printf("fatal: unknown group '%s'. available groups: %s\n", group, strings.Join(Groups(), ", "))
+		if !slices.Contains(groups, group) {
+			fmt.Printf("fatal: unknown group '%s'. available groups: %s\n", group, strings.Join(groups, ", "))
 			os.Exit(1)
 		}
 	}
 
-	baseCmd := sys.Command()
+	// a typo in `requires` would silently never match anything, so catch it here
+	for _, step := range allSteps() {
+		for _, required := range step.requires {
+			if !slices.Contains(groups, required) {
+				fmt.Printf("fatal: step '%s' requires unknown group '%s'\n", step.label, required)
+				os.Exit(1)
+			}
+		}
+	}
+}
 
-	for stepIndex, step := range allSteps() {
-		if stepIndex > 0 {
+func healthy(baseCmd sys.SysCmd, step step_t) bool {
+	for _, healthCmd := range step.healthCheckCommands {
+		if baseCmd.RunAsHome(healthCmd, nil, nil) != 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
+func Install(ignore []string) { runPipeline(installMode, ignore) }
+
+func Update(ignore []string) { runPipeline(updateMode, ignore) }
+
+func Uninstall(ignore []string) { runPipeline(uninstallMode, ignore) }
+
+// List prints the pipeline without touching the system
+func List() {
+	steps := allSteps()
+
+	for index, step := range steps {
+		disabled := ""
+		if step.disabled {
+			disabled = " \033[2;36m(disabled)\033[0m"
+		}
+
+		fmt.Printf("\033[0;34m%02d/%02d\033[0m %s%s\n", index+1, len(steps), step.label, disabled)
+		fmt.Printf("      \033[2;36mgroups:\033[0m %s\n", strings.Join(step.groups, ", "))
+
+		if len(step.requires) > 0 {
+			fmt.Printf("      \033[2;36mneeds:\033[0m %s\n", strings.Join(step.requires, ", "))
+		}
+
+		supports := []string{}
+		if len(step.updateCommands) > 0 {
+			supports = append(supports, "update")
+		}
+		if len(step.uninstallCommands) > 0 {
+			supports = append(supports, "uninstall")
+		}
+
+		if len(supports) > 0 {
+			fmt.Printf("      \033[2;36msupports:\033[0m %s\n", strings.Join(supports, ", "))
+		}
+	}
+}
+
+func runPipeline(mode mode_t, ignore []string) {
+	validate(ignore)
+
+	steps := allSteps()
+	total := len(steps)
+
+	order := make([]int, total)
+	for i := range order {
+		if mode.reverse {
+			order[i] = total - 1 - i
+		} else {
+			order[i] = i
+		}
+	}
+
+	cause := expandIgnored(ignore)
+	baseCmd := sys.Command()
+	ran := 0
+
+	for _, index := range order {
+		step := steps[index]
+		stepCommands := mode.commandsOf(step)
+
+		// update and uninstall are only defined for some of the steps
+		if len(stepCommands) == 0 {
+			continue
+		}
+
+		if ran > 0 {
 			fmt.Println()
 		}
+		ran++
+
+		position := fmt.Sprintf("Step %02d/%02d", index+1, total)
 
 		if step.disabled {
-			fmt.Printf("\033[0;34mStep %02d \033[2;36m(disabled)\033[0;34m: %s\033[0m\n", stepIndex+1, step.label)
+			fmt.Printf("\033[0;34m%s \033[2;36m(disabled)\033[0;34m: %s\033[0m\n", position, step.label)
 			fmt.Printf("  \033[2;36mSkipping...\033[0m\n")
 			continue
 		}
 
-		if group, ok := ignoredGroup(step, ignore); ok {
-			fmt.Printf("\033[0;34mStep %02d \033[2;36m(ignored: %s)\033[0;34m: %s\033[0m\n", stepIndex+1, group, step.label)
+		if reason, ok := ignoredReason(step, cause); ok {
+			fmt.Printf("\033[0;34m%s \033[2;36m(ignored: %s)\033[0;34m: %s\033[0m\n", position, reason, step.label)
 			fmt.Printf("  \033[2;36mSkipping...\033[0m\n")
 			continue
 		}
 
-		fmt.Printf("\033[0;34mStep %02d: %s\033[0m\n", stepIndex+1, step.label)
+		fmt.Printf("\033[0;34m%s: %s\033[0m\n", position, step.label)
 
-		if len(step.healthCheckCommands) > 0 {
-			for _, healthCmd := range step.healthCheckCommands {
-				exitCode := baseCmd.RunAsHome(healthCmd, nil, nil)
+		// install skips what is already there; update skips what was never installed,
+		// because bringing it up from nothing is the install command's job
+		if len(step.healthCheckCommands) > 0 && (mode.skipWhenHealthy || mode.skipWhenUnhealthy) {
+			isHealthy := healthy(baseCmd, step)
 
-				if exitCode != 0 {
-					goto install_step_tools
+			if mode.skipWhenHealthy && isHealthy {
+				fmt.Println()
+				fmt.Printf("  \033[0;36mHealth checks:\033[0m\n\n")
+
+				for _, healthCmd := range step.healthCheckCommands {
+					fmt.Printf("    \033[0;33m$\033[0m %s\n", healthCmd)
+					fmt.Printf("      \033[1;32mok\033[0m\n")
 				}
+
+				fmt.Println()
+				fmt.Printf("  \033[0;36mSkipping %s (%s). already installed...\033[0m\n", position, step.label)
+				continue
 			}
 
-			fmt.Println()
-			fmt.Printf("  \033[0;36mHealth checks:\033[0m\n\n")
-
-			for _, healthCmd := range step.healthCheckCommands {
-				fmt.Printf("    \033[0;33m$\033[0m %s\n", healthCmd)
-				fmt.Printf("      \033[1;32mok\033[0m\n")
+			if mode.skipWhenUnhealthy && !isHealthy {
+				fmt.Println()
+				fmt.Printf("  \033[0;36mNot installed yet, nothing to update. Skipping...\033[0m\n")
+				continue
 			}
-
-			fmt.Println()
-			fmt.Printf("  \033[0;36mSkipping step %02d (%s). already installed...\033[0m\n", stepIndex+1, step.label)
-			continue
 		}
 
-	install_step_tools:
-		for i, cmd := range step.commands {
+		// without health checks there is nothing to tell a real failure from a no-op,
+		// so those steps are best effort. uninstall is best effort by design.
+		abortOnFailure := mode.verifyAfter && len(step.healthCheckCommands) > 0
+
+		for i, cmd := range stepCommands {
 			if i > 0 {
 				fmt.Println()
 			}
@@ -118,41 +316,51 @@ func Install(ignore []string) {
 
 			if exitCode == 0 {
 				fmt.Println("    \033[0;32mok\033[0m")
-			} else {
-				fmt.Printf("    \033[0;31mfail: %d\033[0m", exitCode)
-
-				if len(step.healthCheckCommands) > 0 {
-					fmt.Println()
-					fmt.Printf("\n\ninstallation pipeline faild: step %02d (%s) failed with exit code %d for '%s'\n\n", stepIndex+1, step.label, exitCode, cmd)
-					os.Exit(1)
-				} else {
-					fmt.Println("  ignoring...")
-				}
+				continue
 			}
+
+			fmt.Printf("    \033[0;31mfail: %d\033[0m", exitCode)
+
+			if abortOnFailure {
+				fmt.Println()
+				fmt.Printf("\n\n%s pipeline failed: %s (%s) failed with exit code %d for '%s'\n\n", mode.name, position, step.label, exitCode, cmd)
+				os.Exit(1)
+			}
+
+			fmt.Println("  ignoring...")
 		}
 
 		fmt.Println()
 
-		if len(step.healthCheckCommands) > 0 {
-			fmt.Printf("\033[0;36m  Health checking...\033[0m\n")
-
-			for _, healthCmd := range step.healthCheckCommands {
-				fmt.Printf("    \033[0;33m$\033[0m %s\n", healthCmd)
-
-				exitCode := baseCmd.RunAsHome(healthCmd, nil, nil)
-
-				if exitCode == 0 {
-					fmt.Println("      \033[1;32mok\033[0m")
-				} else {
-					fmt.Printf("      \033[1;31mfail: %d\033[0m\n", exitCode)
-
-					fmt.Printf("\n\ninstallation pipeline faild during helth check: step %02d (%s) failed with exit code %d while health checking '%s'\n\n", stepIndex+1, step.label, exitCode, healthCmd)
-					os.Exit(1)
-				}
-			}
-		} else {
-			fmt.Printf("\033[0;36m  No health checks...\033[0m\n")
+		if !mode.verifyAfter {
+			continue
 		}
+
+		if len(step.healthCheckCommands) == 0 {
+			fmt.Printf("\033[0;36m  No health checks...\033[0m\n")
+			continue
+		}
+
+		fmt.Printf("\033[0;36m  Health checking...\033[0m\n")
+
+		for _, healthCmd := range step.healthCheckCommands {
+			fmt.Printf("    \033[0;33m$\033[0m %s\n", healthCmd)
+
+			exitCode := baseCmd.RunAsHome(healthCmd, nil, nil)
+
+			if exitCode == 0 {
+				fmt.Println("      \033[1;32mok\033[0m")
+				continue
+			}
+
+			fmt.Printf("      \033[1;31mfail: %d\033[0m\n", exitCode)
+			fmt.Printf("\n\n%s pipeline failed during health check: %s (%s) failed with exit code %d while health checking '%s'\n\n", mode.name, position, step.label, exitCode, healthCmd)
+			os.Exit(1)
+		}
+	}
+
+	if ran == 0 {
+		fmt.Printf("nothing to %s: no step defines %s commands\n", mode.name, mode.name)
 	}
 }
 

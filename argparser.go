@@ -11,7 +11,7 @@ import (
 type arguments_t struct {
 	programName string
 
-	install, version, help bool
+	command string
 
 	ignore []string
 }
@@ -19,8 +19,7 @@ type arguments_t struct {
 func CreateArgumentsParser() *arguments_t {
 	return &arguments_t{
 		programName: "",
-		install:     false,
-		version:     false,
+		command:     "",
 	}
 }
 
@@ -65,20 +64,14 @@ func (a *arguments_t) Parse() *arguments_t {
 			}
 
 			a.addIgnored(value)
-		case "install":
-			a.install = true
-		case "version":
-			a.version = true
-		case "help":
-			a.help = true
+		case "install", "update", "uninstall", "list", "version", "help":
+			a.command = arg
 		}
 	}
 
-	// force help when "help" or no command is informed
-	if a.help || (!a.version && !a.install) {
-		a.help = true
-		a.version = false
-		a.install = false
+	// force help when no command is informed
+	if a.command == "" {
+		a.command = "help"
 	}
 
 	return a
@@ -97,10 +90,15 @@ func (a *arguments_t) Help() {
 	fmt.Printf("\n")
 	fmt.Printf("Commands:\n")
 	fmt.Printf("  install     install tools to the system. (requires sudo)\n")
+	fmt.Printf("  update      pull and rebuild the tools installed from source. (requires sudo)\n")
+	fmt.Printf("  uninstall   remove what this tool created: symlinks, alternatives and desktop\n")
+	fmt.Printf("              entries. packages, toolchains and clones are left alone. (requires sudo)\n")
+	fmt.Printf("  list        print the pipeline without touching the system\n")
 	fmt.Printf("  version     show tool version\n")
 	fmt.Printf("  help        show this help message\n")
 	fmt.Printf("\n")
 	fmt.Printf("Options:\n")
-	fmt.Printf("  -ignore <groups>  comma separated list of step groups to skip during install\n")
+	fmt.Printf("  -ignore <groups>  comma separated list of step groups to skip\n")
+	fmt.Printf("                    ignoring a group also skips every group that needs it\n")
 	fmt.Printf("                    groups: %s\n", strings.Join(commands.Groups(), ", "))
 }

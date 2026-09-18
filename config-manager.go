@@ -9,17 +9,23 @@ import (
 
 func main() {
 	// bake it during build with commit and date
-	const VERSION = "3.0.0"
+	const VERSION = "3.1.0"
 
 	args := CreateArgumentsParser().Parse()
 
-	switch true {
-	case args.version:
+	switch args.command {
+	case "version":
 		fmt.Println(VERSION)
-	case args.help:
-		args.Help()
-	case args.install:
+	case "install":
 		commands.Install(args.ignore)
+	case "update":
+		commands.Update(args.ignore)
+	case "uninstall":
+		commands.Uninstall(args.ignore)
+	case "list":
+		commands.List()
+	case "help":
+		args.Help()
 	default:
 		args.Help()
 		os.Exit(1)

@@ -248,6 +248,7 @@
         <span>Setting up a headless box?</span>
         <pre>sudo config-manager install -ignore desktop,alacritty</pre>
       </div>
+      <p class="section-lead" style="margin: 14px 0 0;">Ignoring a group also skips everything that needs it, so <code>-ignore cargo</code> takes <code>helix</code>, <code>alacritty</code> and <code>mark</code> with it.</p>
     </section>
 
     <section id="how">
@@ -256,12 +257,13 @@
       <div class="steps">
         <div class="step">
           <h3>Declare the steps</h3>
-          <p>Each step has a label, groups, commands and health checks. Adding a tool takes a few lines.</p>
+          <p>Each step has a label, groups, commands and health checks, and can name the groups it needs. Adding a tool takes a few lines.</p>
           <pre>{
-  label:  "Tmux",
-  groups: []string{"tmux"},
-  commands: []string{"apt-get install tmux -y"},
-  healthCheckCommands: []string{"which tmux"},
+  label:    "Download &amp; Build Tmuxer",
+  groups:   []string{"tmuxer"},
+  requires: []string{"nim", "git"},
+  commands: []string{"... nimble build -d:release -y"},
+  healthCheckCommands: []string{"tmuxer -h"},
 }</pre>
         </div>
         <div class="step">
@@ -337,14 +339,14 @@
         ['<span class="t-sky">  Health checking...</span>', 150],
         ['      <span class="t-green">ok</span>', 500],
         ['', 60],
-        ['<span class="t-blue">Step 17: Helix as default editor</span>', 300],
+        ['<span class="t-blue">Step 17/31: Helix as default editor</span>', 300],
         ['  <span class="t-yellow">$</span> update-alternatives --set editor /usr/local/bin/hx', 300],
         ['    <span class="t-green">ok</span>', 500],
         ['', 60],
-        ['<span class="t-blue">Step 18 <span class="t-dim">(ignored: dotnet)</span>: Dotnet</span>', 150],
+        ['<span class="t-blue">Step 18/31 <span class="t-dim">(ignored: dotnet)</span>: Dotnet</span>', 150],
         ['  <span class="t-dim">Skipping...</span>', 500],
         ['', 60],
-        ['<span class="t-blue">Step 26: Link configs</span>', 300],
+        ['<span class="t-blue">Step 26/31: Link configs</span>', 300],
         ['  <span class="t-yellow">$</span> ln -sfn ~/.config-manager/configs/helix/config.toml ~/.config/helix/config.toml', 300],
         ['    <span class="t-green">ok</span>', 900]
       ];

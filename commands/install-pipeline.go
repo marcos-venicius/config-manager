@@ -152,9 +152,10 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label:  "Download & Build Helix",
-		groups: []string{"helix"},
-		asHome: true,
+		label:    "Download & Build Helix",
+		groups:   []string{"helix"},
+		requires: []string{"cargo", "git"},
+		asHome:   true,
 		commands: []string{
 			"mkdir -p $HOME/.config/helix",
 			"mkdir -p $HOME/tools",
@@ -163,6 +164,10 @@ var installationSteps = []step_t{
 		},
 		healthCheckCommands: []string{
 			"$HOME/tools/helix/target/release/hx --version",
+		},
+		updateCommands: []string{
+			"cd $HOME/tools/helix && git pull --ff-only",
+			"cd $HOME/tools/helix && $HOME/.cargo/bin/cargo build --release",
 		},
 	},
 	{
@@ -176,6 +181,9 @@ var installationSteps = []step_t{
 			"[ \"$(readlink /usr/local/bin/hx)\" = \"$HOME/tools/helix/target/release/hx\" ]",
 			"hx --version",
 		},
+		uninstallCommands: []string{
+			"rm -f /usr/local/bin/hx",
+		},
 	},
 	{
 		label:  "Helix runtime & grammars",
@@ -183,6 +191,11 @@ var installationSteps = []step_t{
 		asHome: true,
 		commands: []string{
 			"ln -Tsf $HOME/tools/helix/runtime $HOME/.config/helix/runtime",
+			"hx --grammar fetch",
+			"hx --grammar build",
+		},
+		// a newer helix ships newer grammars
+		updateCommands: []string{
 			"hx --grammar fetch",
 			"hx --grammar build",
 		},
@@ -203,6 +216,10 @@ var installationSteps = []step_t{
 		healthCheckCommands: []string{
 			"[ \"$(readlink -f /usr/bin/editor)\" = \"$(readlink -f /usr/local/bin/hx)\" ]",
 			"[ \"$(readlink -f /usr/bin/vi)\" = \"$(readlink -f /usr/local/bin/hx)\" ]",
+		},
+		uninstallCommands: []string{
+			"update-alternatives --remove editor /usr/local/bin/hx",
+			"update-alternatives --remove vi /usr/local/bin/hx",
 		},
 	},
 	{
@@ -249,9 +266,10 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label:  "Download & Build Tmuxer",
-		groups: []string{"tmuxer"},
-		asHome: true,
+		label:    "Download & Build Tmuxer",
+		groups:   []string{"tmuxer"},
+		requires: []string{"nim", "git"},
+		asHome:   true,
 		commands: []string{
 			"mkdir -p $HOME/tools",
 			"[ -d $HOME/tools/tmuxer ] || git clone --depth 1 https://github.com/marcos-venicius/tmuxer.git $HOME/tools/tmuxer",
@@ -260,6 +278,10 @@ var installationSteps = []step_t{
 		},
 		healthCheckCommands: []string{
 			"$HOME/tools/tmuxer/bin/tmuxer -h",
+		},
+		updateCommands: []string{
+			"cd $HOME/tools/tmuxer && git pull --ff-only",
+			"cd $HOME/tools/tmuxer && PATH=$HOME/.nimble/bin:$PATH nimble build -d:release -y",
 		},
 	},
 	{
@@ -272,6 +294,9 @@ var installationSteps = []step_t{
 		healthCheckCommands: []string{
 			"[ \"$(readlink /usr/local/bin/tmuxer)\" = \"$HOME/tools/tmuxer/bin/tmuxer\" ]",
 			"tmuxer -h",
+		},
+		uninstallCommands: []string{
+			"rm -f /usr/local/bin/tmuxer",
 		},
 	},
 	{
@@ -289,9 +314,10 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label:  "Download & Install Mark",
-		groups: []string{"mark"},
-		asHome: true,
+		label:    "Download & Install Mark",
+		groups:   []string{"mark"},
+		requires: []string{"cargo", "git"},
+		asHome:   true,
 		commands: []string{
 			"mkdir -p $HOME/tools",
 			"[ -d $HOME/tools/mark ] || git clone --depth 1 https://github.com/marcos-venicius/mark.git $HOME/tools/mark",
@@ -302,6 +328,14 @@ var installationSteps = []step_t{
 		healthCheckCommands: []string{
 			"$HOME/.local/bin/mark --version",
 			"[ -s $HOME/.local/share/applications/mark.desktop ]",
+		},
+		updateCommands: []string{
+			"cd $HOME/tools/mark && git pull --ff-only",
+			"cd $HOME/tools/mark && PATH=$HOME/.cargo/bin:$PATH ./install.sh",
+		},
+		// mark ships the exact inverse of its installer
+		uninstallCommands: []string{
+			"! [ -x $HOME/tools/mark/uninstall.sh ] || (cd $HOME/tools/mark && ./uninstall.sh)",
 		},
 	},
 	{
@@ -319,21 +353,26 @@ var installationSteps = []step_t{
 	linkConfigsStep(),
 	// alacritty installation is too slow, keep it (and its defaults) at the end
 	{
-		label:  "Alacritty",
-		groups: []string{"alacritty"},
-		asHome: true,
+		label:    "Alacritty",
+		groups:   []string{"alacritty"},
+		requires: []string{"cargo"},
+		asHome:   true,
 		commands: []string{
 			"$HOME/.cargo/bin/cargo install alacritty",
 		},
 		healthCheckCommands: []string{
 			"$HOME/.cargo/bin/alacritty --version",
 		},
+		uninstallCommands: []string{
+			"$HOME/.cargo/bin/cargo uninstall alacritty",
+		},
 	},
 	{
 		// cargo install does not ship the desktop entry nor the icon
-		label:  "Alacritty as default terminal",
-		groups: []string{"alacritty"},
-		asHome: true,
+		label:    "Alacritty as default terminal",
+		groups:   []string{"alacritty"},
+		requires: []string{"cargo"},
+		asHome:   true,
 		commands: []string{
 			"mkdir -p $HOME/.local/share/applications $HOME/.local/share/icons/hicolor/scalable/apps",
 			`set -o pipefail; curl -fsSL https://raw.githubusercontent.com/alacritty/alacritty/master/extra/linux/Alacritty.desktop | sed -E "s#^(TryExec|Exec)=alacritty#\1=$HOME/.cargo/bin/alacritty#" > $HOME/.local/share/applications/Alacritty.desktop`,
@@ -353,11 +392,19 @@ var installationSteps = []step_t{
 			`! command -v xdg-mime >/dev/null || [ "$(xdg-mime query default x-scheme-handler/terminal)" = Alacritty.desktop ]`,
 			`grep -qF "Terminal: \"$HOME/.cargo/bin/alacritty\"" $HOME/.config/cosmic/com.system76.CosmicSettings.Shortcuts/v1/system_actions`,
 		},
+		// the COSMIC shortcut file is left alone: the install backed the previous one
+		// up next to it, and guessing which backup to restore is worse than doing nothing
+		uninstallCommands: []string{
+			"rm -f $HOME/.local/share/applications/Alacritty.desktop",
+			"rm -f $HOME/.local/share/icons/hicolor/scalable/apps/Alacritty.svg",
+			"! command -v update-desktop-database >/dev/null || update-desktop-database $HOME/.local/share/applications",
+		},
 	},
 	{
 		// runs as root, so $HOME is not the user's home
-		label:  "Alacritty as x-terminal-emulator",
-		groups: []string{"alacritty"},
+		label:    "Alacritty as x-terminal-emulator",
+		groups:   []string{"alacritty"},
+		requires: []string{"cargo"},
 		commands: []string{
 			`update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator "$(getent passwd "$SUDO_USER" | cut -d: -f6)/.cargo/bin/alacritty" 60`,
 			`update-alternatives --set x-terminal-emulator "$(getent passwd "$SUDO_USER" | cut -d: -f6)/.cargo/bin/alacritty"`,
@@ -365,14 +412,19 @@ var installationSteps = []step_t{
 		healthCheckCommands: []string{
 			`[ "$(readlink -f /usr/bin/x-terminal-emulator)" = "$HOME/.cargo/bin/alacritty" ]`,
 		},
+		uninstallCommands: []string{
+			`update-alternatives --remove x-terminal-emulator "$(getent passwd "$SUDO_USER" | cut -d: -f6)/.cargo/bin/alacritty"`,
+		},
 	},
 }
 
 // repository root; defaults to the clone location described in the README
 const configManagerDir = "${CONFIG_MANAGER_DIR:-$HOME/.config-manager}"
 
-// linkConfig symlinks configs/<src> to dst, moving any existing non-symlink dst to dst.bak.<timestamp>
-func linkConfig(src, dst string) (command string, healthCheck string) {
+// linkConfig symlinks configs/<src> to dst, moving any existing non-symlink dst to dst.bak.<timestamp>.
+// unlink only removes dst when it still points at this repository, so a link the user
+// repointed somewhere else survives; the .bak copies are left where the install put them.
+func linkConfig(src, dst string) (command string, healthCheck string, unlink string) {
 	target := configManagerDir + "/configs/" + src
 
 	command = fmt.Sprintf(
@@ -380,8 +432,9 @@ func linkConfig(src, dst string) (command string, healthCheck string) {
 		target, dst,
 	)
 	healthCheck = fmt.Sprintf(`[ "$(readlink "%s")" = "%s" ]`, dst, target)
+	unlink = fmt.Sprintf(`! [ "$(readlink "%[2]s")" = "%[1]s" ] || rm -f "%[2]s"`, target, dst)
 
-	return command, healthCheck
+	return command, healthCheck, unlink
 }
 
 func linkConfigsStep() step_t {
@@ -404,13 +457,17 @@ func linkConfigsStep() step_t {
 		healthCheckCommands: []string{
 			`grep -qx 'SELECTED_EDITOR="/usr/local/bin/hx"' $HOME/.selected_editor`,
 		},
+		uninstallCommands: []string{
+			`rm -f $HOME/.selected_editor`,
+		},
 	}
 
 	for _, link := range links {
-		command, healthCheck := linkConfig(link[0], link[1])
+		command, healthCheck, unlink := linkConfig(link[0], link[1])
 
 		step.commands = append(step.commands, command)
 		step.healthCheckCommands = append(step.healthCheckCommands, healthCheck)
+		step.uninstallCommands = append(step.uninstallCommands, unlink)
 	}
 
 	return step
