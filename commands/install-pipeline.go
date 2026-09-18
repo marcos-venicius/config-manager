@@ -339,6 +339,34 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		// the native installer, which is what the docs recommend: it drops a launcher in
+		// $HOME/.local/bin (already on PATH via configs/.bashrc) and keeps itself updated
+		label:  "Claude Code",
+		groups: []string{"claude"},
+		asHome: true,
+		commands: []string{
+			// downloaded first rather than piped straight into bash, same as the cargo and nim steps
+			"curl -fsSL https://claude.ai/install.sh > /tmp/claude-install.sh",
+			"chmod u+x /tmp/claude-install.sh",
+			// the installer inspects PATH to decide whether to warn, and this shell does
+			// not read .bashrc, where $HOME/.local/bin is actually added
+			"PATH=$HOME/.local/bin:$PATH /tmp/claude-install.sh",
+			"rm -f /tmp/claude-install.sh",
+		},
+		healthCheckCommands: []string{
+			"$HOME/.local/bin/claude --version",
+		},
+		updateCommands: []string{
+			"PATH=$HOME/.local/bin:$PATH claude update",
+		},
+		// $HOME/.claude and $HOME/.claude.json stay: those are settings, history and MCP
+		// servers, which is user data rather than something this pipeline created
+		uninstallCommands: []string{
+			"rm -f $HOME/.local/bin/claude",
+			"rm -rf $HOME/.local/share/claude",
+		},
+	},
+	{
 		// alacritty installation dependency
 		label:  "Font config",
 		groups: []string{"alacritty"},

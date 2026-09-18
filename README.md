@@ -10,6 +10,7 @@ This is my tools config manager. It provides configuration for:
 - Tmux
 - Tmuxer (my tmux session setup tool, built from source)
 - Mark (my markdown viewer, registered as the default `.md` handler)
+- Claude Code (native install, keeps itself updated)
 - Alacritty (default terminal: GNOME, COSMIC, x-terminal-emulator and xdg default apps)
 - Helix (default editor, every vim/neovim package is removed)
 - Git config
@@ -62,7 +63,7 @@ also skips everything that depends on it, transitively. Ignoring `cargo` therefo
 `alacritty` and `mark` as well, and the output says why:
 
 ```
-Step 14/31 (ignored: helix needs cargo): Download & Build Helix
+Step 14/32 (ignored: helix needs cargo): Download & Build Helix
 ```
 
 ## Desktop (GNOME)
