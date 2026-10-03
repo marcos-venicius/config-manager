@@ -12,3 +12,7 @@ file-types = [
   "md",
   { glob = "*-*-*-*.txt" } # this is used for my [daily tool](https://github.com/marcos-venicius/daily)
 ]
+
+[language-server.jdtls]
+command = "jdtls"
+args = ["--jvm-arg=-javaagent:/home/dev/.local/share/jdtls/lombok.jar"]

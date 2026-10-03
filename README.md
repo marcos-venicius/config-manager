@@ -12,7 +12,7 @@ This is my tools config manager. It provides configuration for:
 - Mark (my markdown viewer, registered as the default `.md` handler)
 - Claude Code (native install, keeps itself updated, plus the tmux-claude-hatch plugin and a terminal bell as soon as a turn ends)
 - Alacritty (default terminal: GNOME, COSMIC, x-terminal-emulator and xdg default apps)
-- Helix (default editor, every vim/neovim package is removed)
+- Helix, from my fork [marcos-venicius/helix](https://github.com/marcos-venicius/helix) (branch `marcos`: upstream plus my own features). It is the default editor, and every vim/neovim package is removed
 - Git config
 - Bash
 - Kubectl

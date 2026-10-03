@@ -6,6 +6,13 @@ import (
 	"path/filepath"
 )
 
+const (
+	helixFork     = "https://github.com/marcos-venicius/helix.git"
+	helixUpstream = "https://github.com/helix-editor/helix.git"
+	// fails (and says why) when ~/tools/helix is not on the fork's main branch
+	helixOnMarcos = "{ [ \"$(git branch --show-current)\" = marcos ] || { echo 'helix: ~/tools/helix is not on the marcos branch, skipping' >&2; exit 1; }; }"
+)
+
 var installationSteps = []step_t{
 	{
 		label:  "APT GET Update",
@@ -178,6 +185,7 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		// personal fork: upstream helix plus my own features, on the `marcos` branch
 		label:    "Download & Build Helix",
 		groups:   []string{"helix"},
 		requires: []string{"cargo", "git"},
@@ -185,15 +193,27 @@ var installationSteps = []step_t{
 		commands: []string{
 			"mkdir -p $HOME/.config/helix",
 			"mkdir -p $HOME/tools",
-			"[ -d $HOME/tools/helix ] || git clone --depth 1 https://github.com/helix-editor/helix.git $HOME/tools/helix",
+			// full clone: the checkout is also where the fork is developed and synced with upstream
+			"[ -d $HOME/tools/helix ] || git clone --branch marcos " + helixFork + " $HOME/tools/helix",
+			// a clone of the official repository, from before the fork, is switched over to it. That
+			// clone was shallow, hence single-branch: widen the refspec so origin/marcos gets fetched
+			"cd $HOME/tools/helix && git remote get-url origin | grep -q marcos-venicius/helix || { " +
+				"git remote set-url origin " + helixFork + " && " +
+				"git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*' && " +
+				"git fetch $([ -f .git/shallow ] && echo --unshallow) origin && " +
+				"git checkout -B marcos origin/marcos; }",
+			"cd $HOME/tools/helix && { git remote get-url upstream >/dev/null 2>&1 || git remote add upstream " + helixUpstream + "; }",
 			"cd $HOME/tools/helix && $HOME/.cargo/bin/cargo build --release",
 		},
 		healthCheckCommands: []string{
+			"git -C $HOME/tools/helix remote get-url origin | grep -q marcos-venicius/helix",
 			"$HOME/tools/helix/target/release/hx --version",
 		},
+		// commands keep running after a failure in update mode, so the branch guard has to be
+		// part of each command: never pull into or build a feature branch that is checked out
 		updateCommands: []string{
-			"cd $HOME/tools/helix && git pull --ff-only",
-			"cd $HOME/tools/helix && $HOME/.cargo/bin/cargo build --release",
+			"cd $HOME/tools/helix && " + helixOnMarcos + " && git pull --ff-only origin marcos",
+			"cd $HOME/tools/helix && " + helixOnMarcos + " && $HOME/.cargo/bin/cargo build --release",
 		},
 	},
 	{
@@ -202,13 +222,17 @@ var installationSteps = []step_t{
 		groups: []string{"helix"},
 		commands: []string{
 			"ln -sf \"$(getent passwd \"$SUDO_USER\" | cut -d: -f6)/tools/helix/target/release/hx\" /usr/local/bin/hx",
+			"ln -sf \"$(getent passwd \"$SUDO_USER\" | cut -d: -f6)/tools/helix/target/release/hx\" /usr/local/bin/h",
 		},
 		healthCheckCommands: []string{
 			"[ \"$(readlink /usr/local/bin/hx)\" = \"$HOME/tools/helix/target/release/hx\" ]",
 			"hx --version",
+			"[ \"$(readlink /usr/local/bin/h)\" = \"$HOME/tools/helix/target/release/h\" ]",
+			"h --version",
 		},
 		uninstallCommands: []string{
 			"rm -f /usr/local/bin/hx",
+			"rm -f /usr/local/bin/h",
 		},
 	},
 	{

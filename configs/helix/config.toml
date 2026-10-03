@@ -16,8 +16,8 @@ insert-final-newline = false
 auto-pairs = true
 
 [editor.auto-save]
-after-delay.enable = true
-after-delay.timeout = 1000
+after-delay.enable = false
+# after-delay.timeout = 1000
 
 [editor.search]
 smart-case = true
