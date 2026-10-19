@@ -5,7 +5,9 @@
 # theme = "zenburned"
 # theme = "base16_transparent"
 # theme = "gruvbox_dark_hard"
-theme = "catppuccin_mocha"
+# theme = "catppuccin_mocha"
+# theme = "everforest_dark"
+theme = "kanagawa"
 
 [editor]
 line-number = "relative"
