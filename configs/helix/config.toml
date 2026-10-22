@@ -21,6 +21,9 @@ auto-pairs = true
 after-delay.enable = false
 # after-delay.timeout = 1000
 
+[editor.soft-wrap]
+enable = true
+
 [editor.search]
 smart-case = true
 wrap-around = true
@@ -31,7 +34,7 @@ hidden = false
 
 [editor.whitespace.render]
 tab = "all"
-newline = "all"
+# newline = "all"
 
 [editor.lsp]
 auto-signature-help = false
@@ -48,7 +51,7 @@ mode.select = "SELECT"
 # insert = "empty-box"
 
 [editor.indent-guides]
-render = true
+render = false
 skip-levels = 0
 
 [keys.insert]
