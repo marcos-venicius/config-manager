@@ -5,34 +5,19 @@
 > [!WARNING]
 > These are **my** personal configurations. Maybe it will not work on your environment.
 
-This is my tools config manager. It provides configuration for:
-
-- Tmux (with tpm: Catppuccin and claude-hatch, plus its fzf and jq)
-- Tmuxer (my tmux session setup tool, built from source)
-- Mark (my markdown viewer, registered as the default `.md` handler)
-- Claude Code (native install, keeps itself updated, plus the tmux-claude-hatch plugin and a terminal bell as soon as a turn ends)
-- Alacritty (default terminal: GNOME, COSMIC, x-terminal-emulator and xdg default apps)
-- Helix, from my fork [marcos-venicius/helix](https://github.com/marcos-venicius/helix) (branch `marcos`: upstream plus my own features). It is the default editor, and every vim/neovim package is removed
-- Git config
-- Bash
-- Kubectl
-- Nim
-- Go
-- Rust
-- .NET
-- C and family (clang, gcc, make, etc)
-
 If you want to see every single command that this tool will run on your machine
 during the installation process, you can view [this file](./commands/install-pipeline.go),
 or run `config-manager list` to print the pipeline with its groups and dependencies.
 
+Access https://marcos-venicius.github.io/config-manager/ to see more details about the tool.
+
 ## Commands
 
 ```bash
-sudo config-manager install      # run the pipeline
-sudo config-manager update       # pull and rebuild what was built from source
-sudo config-manager uninstall    # remove what this tool created
-config-manager list              # print the pipeline, touching nothing
+sudo $(which config-manager) install      # run the pipeline
+sudo $(which config-manager) update       # pull and rebuild what was built from source
+sudo $(which config-manager) uninstall    # remove what this tool created
+config-manager list                       # print the pipeline, touching nothing
 ```
 
 `update` only touches the tools built from a git clone (helix, tmuxer, mark): it pulls, rebuilds and
@@ -53,7 +38,7 @@ made during install are left where they are — restoring the right one is your 
 Every step belongs to one or more groups. Use `-ignore` to skip them:
 
 ```bash
-sudo config-manager install -ignore desktop,dotnet
+sudo $(which config-manager) install -ignore desktop,dotnet
 ```
 
 Run `config-manager help` to list the groups.
@@ -71,9 +56,9 @@ Step 16/36 (ignored: helix needs cargo): Download & Build Helix
 `-only` is the inverse: it runs the groups you name and skips everything else.
 
 ```bash
-sudo config-manager install   -only claude
-sudo config-manager update    -only tmuxer
-sudo config-manager uninstall -only mark
+sudo $(which config-manager) install   -only claude
+sudo $(which config-manager) update    -only tmuxer
+sudo $(which config-manager) uninstall -only mark
 ```
 
 `install` pulls in whatever the named groups are built on, transitively, so you do not have to
@@ -81,7 +66,7 @@ know the graph. `base` always comes along, since every group assumes apt, curl a
 It tells you what it added:
 
 ```
-$ sudo config-manager install -only tpm
+$ sudo $(which config-manager) install -only tpm
 -only tpm also runs what it needs: base, git, tmux, fzf, jq, configs
 ```
 
@@ -113,26 +98,13 @@ The repository is found in this order: `CONFIG_MANAGER_DIR` if you set it, then 
 are running from if it has a `configs/`, then `~/.config-manager`. So running it out of a clone
 works wherever the clone lives:
 
-```bash
-cd ~/tools/config-manager && sudo ./config-manager install
-```
-
-Set `CONFIG_MANAGER_DIR` when the binary is installed elsewhere and you are not in the clone:
-
-```bash
-sudo CONFIG_MANAGER_DIR=~/tools/config-manager config-manager install
-```
-
-If none of the three resolves, it says so and exits before running a single step, rather than
-failing on the link step twenty minutes in.
-
 Machine-specific or sensitive settings (passwords, work paths, `KUBECONFIG`, ...) must go in `~/.bashrc.local`,
 which is sourced by `.bashrc` and is **not** versioned.
 
 ## Installing the tool
 
 ```bash
-git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager && go install github.com/marcos-venicius/config-manager
+go install github.com/marcos-venicius/config-manager@latest
 ```
 
 ## Testing during development
@@ -147,7 +119,3 @@ This command will install and configure all the tools inside a docker container 
 the process.
 
 Once you did that, you can clean up the room by running `make clean`.
-
-## Tasks
-
-- Wodo (later)

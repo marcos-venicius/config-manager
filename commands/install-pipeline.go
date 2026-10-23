@@ -23,6 +23,22 @@ var installationSteps = []step_t{
 		},
 	},
 	{
+		label: "Font",
+		asHome: true,
+		groups: []string{"font"},
+		commands: []string{
+			"wget -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip",
+			"cd ~/.local/share/fonts && unzip JetBrainsMono.zip && rm JetBrainsMono.zip",
+			"fc-cache -f -v",
+		},
+		healthCheckCommands: []string{
+			"ls -lah ~/.local/share/fonts/ | grep 'JetBrainsMono*'",
+		},
+		uninstallCommands: []string{
+			"rm -rf ~/.local/share/fonts/JetBrainsMono*",
+		},
+	},
+	{
 		label:  "Install add-apt-repository",
 		groups: []string{"base"},
 		commands: []string{
@@ -106,6 +122,20 @@ var installationSteps = []step_t{
 		},
 		healthCheckCommands: []string{
 			"git --version",
+		},
+	},
+	{
+		label: "Config Manager",
+		asHome: true,
+		groups: []string{"config-manager"},
+		commands: []string{
+			"git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager --depth=1",
+		},
+		healthCheckCommands: []string{
+			"ls ~/.config-manager 2>/dev/null 1>/dev/null",
+		},
+		uninstallCommands: []string{
+			"rm -rf ~/.config-manager",
 		},
 	},
 	{
@@ -227,7 +257,7 @@ var installationSteps = []step_t{
 		healthCheckCommands: []string{
 			"[ \"$(readlink /usr/local/bin/hx)\" = \"$HOME/tools/helix/target/release/hx\" ]",
 			"hx --version",
-			"[ \"$(readlink /usr/local/bin/h)\" = \"$HOME/tools/helix/target/release/h\" ]",
+			"[ \"$(readlink /usr/local/bin/h)\" = \"$HOME/tools/helix/target/release/hx\" ]",
 			"h --version",
 		},
 		uninstallCommands: []string{
@@ -285,19 +315,6 @@ var installationSteps = []step_t{
 		},
 		healthCheckCommands: []string{
 			"$HOME/.dotnet/dotnet --list-sdks | grep -qPo '9\\d*\\.\\d+\\.\\d+'",
-		},
-	},
-	{
-		label:  "GO Lang",
-		groups: []string{"go"},
-		commands: []string{
-			"rm -rf /tmp/golang-installation && mkdir -p /tmp/golang-installation",
-			"wget https://go.dev/dl/go1.26.1.linux-amd64.tar.gz -O /tmp/golang-installation/go1.26.1.linux-amd64.tar.gz",
-			"rm -rf /opt/go && tar -C /opt -xzf /tmp/golang-installation/go1.26.1.linux-amd64.tar.gz",
-			"rm -rf /tmp/golang-installation",
-		},
-		healthCheckCommands: []string{
-			"/opt/go/bin/go version",
 		},
 	},
 	{
@@ -631,6 +648,7 @@ func linkConfigsStep() step_t {
 		label:  "Link configs",
 		groups: []string{"configs"},
 		asHome: true,
+		requires: []string{"config-manager"},
 		commands: []string{
 			`echo 'SELECTED_EDITOR="/usr/local/bin/hx"' > $HOME/.selected_editor`,
 		},
