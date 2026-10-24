@@ -13,6 +13,13 @@ const (
 	helixOnMarcos = "{ [ \"$(git branch --show-current)\" = marcos ] || { echo 'helix: ~/tools/helix is not on the marcos branch, skipping' >&2; exit 1; }; }"
 )
 
+const dockerSource = `Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc`
+
 var installationSteps = []step_t{
 	{
 		label:  "APT GET Update",
@@ -23,19 +30,30 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Font",
-		asHome: true,
-		groups: []string{"font"},
+		label:  "Util Linux Extra",
+		groups: []string{"base"},
 		commands: []string{
-			"wget -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip",
-			"cd ~/.local/share/fonts && unzip JetBrainsMono.zip && rm JetBrainsMono.zip",
-			"fc-cache -f -v",
+			"apt-get install util-linux-extra -y",
 		},
 		healthCheckCommands: []string{
-			"ls -lah ~/.local/share/fonts/ | grep 'JetBrainsMono*'",
+			"which newgrp",
 		},
 		uninstallCommands: []string{
-			"rm -rf ~/.local/share/fonts/JetBrainsMono*",
+			"apt-get remove util-linux-extra -y",
+		},
+	},
+	{
+		label:  "Curl + Wget + Ca-Certificates",
+		groups: []string{"base"},
+		commands: []string{
+			"apt-get install curl -y",
+			"apt-get install wget -y",
+			"apt-get install ca-certificates -y",
+		},
+		healthCheckCommands: []string{
+			"wget --version",
+			"curl --version",
+			"dpkg -s ca-certificates",
 		},
 	},
 	{
@@ -49,18 +67,6 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label:  "Curl + Wget",
-		groups: []string{"base"},
-		commands: []string{
-			"apt-get install curl -y",
-			"apt-get install wget -y",
-		},
-		healthCheckCommands: []string{
-			"wget --version",
-			"curl --version",
-		},
-	},
-	{
 		label:  "Build Essentials",
 		groups: []string{"base"},
 		commands: []string{
@@ -69,6 +75,52 @@ var installationSteps = []step_t{
 		healthCheckCommands: []string{
 			"gcc --version",
 			"make --version",
+		},
+	},
+	{
+		label:    "Install Docker",
+		groups:   []string{"docker"},
+		requires: []string{"base"},
+		commands: []string{
+			"apt-get remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc docker-buildx podman-docker containerd runc | cut -f1) -y",
+			"install -m 0755 -d /etc/apt/keyrings",
+			"curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc",
+			"chmod a+r /etc/apt/keyrings/docker.asc",
+			fmt.Sprintf("tee /etc/apt/sources.list.d/docker.sources <<EOF\n%s\nEOF\n", dockerSource),
+			"apt-get update -y",
+			"apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y",
+			"systemctl enable docker",
+			"systemctl start docker",
+			"groupadd docker || :",
+			"usermod -aG docker $(basename $HOME) || :",
+			"newgrp docker",
+		},
+		healthCheckCommands: []string{
+			"which docker",
+		},
+		uninstallCommands: []string{
+			"systemctl disable docker",
+			"apt purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras",
+			"rm -rf /var/lib/docker",
+			"rm -rf /var/lib/containerd",
+			"rm /etc/apt/sources.list.d/docker.sources",
+			"rm /etc/apt/keyrings/docker.asc",
+		},
+	},
+	{
+		label:  "Font",
+		asHome: true,
+		groups: []string{"font"},
+		commands: []string{
+			"wget -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip",
+			"cd ~/.local/share/fonts && unzip JetBrainsMono.zip && rm JetBrainsMono.zip",
+			"fc-cache -f -v",
+		},
+		healthCheckCommands: []string{
+			"ls -lah ~/.local/share/fonts/ | grep 'JetBrainsMono*'",
+		},
+		uninstallCommands: []string{
+			"rm -rf ~/.local/share/fonts/JetBrainsMono*",
 		},
 	},
 	{
@@ -125,7 +177,7 @@ var installationSteps = []step_t{
 		},
 	},
 	{
-		label: "Config Manager",
+		label:  "Config Manager",
 		asHome: true,
 		groups: []string{"config-manager"},
 		commands: []string{
@@ -645,9 +697,9 @@ func linkConfigsStep() step_t {
 	}
 
 	step := step_t{
-		label:  "Link configs",
-		groups: []string{"configs"},
-		asHome: true,
+		label:    "Link configs",
+		groups:   []string{"configs"},
+		asHome:   true,
 		requires: []string{"config-manager"},
 		commands: []string{
 			`echo 'SELECTED_EDITOR="/usr/local/bin/hx"' > $HOME/.selected_editor`,
