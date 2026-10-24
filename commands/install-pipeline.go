@@ -92,8 +92,7 @@ var installationSteps = []step_t{
 			"systemctl enable docker",
 			"systemctl start docker",
 			"groupadd docker || :",
-			"usermod -aG docker $(basename $HOME) || :",
-			"newgrp docker",
+			"usermod -aG docker $(logname) || :",
 		},
 		healthCheckCommands: []string{
 			"which docker",
