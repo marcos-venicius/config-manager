@@ -147,6 +147,7 @@ fi
 
 export PATH="$PATH:/opt/go/bin"
 export PATH="$PATH:$HOME/go/bin"
+export PATH="$HOME/.asdf/bin:$HOME/.asdf/shims:$PATH"
 
 set -o vi
 . "$HOME/.cargo/env"

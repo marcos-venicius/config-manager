@@ -1,7 +1,6 @@
 IMAGE_NAME := config-manager:test
-BINARY_NAME := config-manager
 
-.PHONY: all build-image build-go install clean
+.PHONY: all build-image install clean
 
 all: install
 
@@ -13,14 +12,9 @@ build-image:
 		echo "Image $(IMAGE_NAME) already exists. Skipping build."; \
 	fi
 
-build-go:
-	@echo "Building Go binary for Linux..."
-	GOOS=linux GOARCH=amd64 go build -o $(BINARY_NAME) .
-
-install: build-image build-go
-	@echo "Running './$(BINARY_NAME) install' inside $(IMAGE_NAME)..."
-	docker run --rm -v $(shell pwd):/app -w /app $(IMAGE_NAME) sudo CONFIG_MANAGER_DIR=/app ./$(BINARY_NAME) install -ignore desktop
+install: build-image
+	@echo "Running './config-manager.sh install' inside $(IMAGE_NAME)..."
+	docker run --rm -v $(shell pwd):/app -w /app $(IMAGE_NAME) sudo CONFIG_MANAGER_DIR=/app ./config-manager.sh install -ignore desktop
 
 clean:
 	docker image rm $(IMAGE_NAME) 2>/dev/null || true
-	rm -f $(BINARY_NAME)

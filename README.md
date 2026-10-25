@@ -6,18 +6,28 @@
 > These are **my** personal configurations. Maybe it will not work on your environment.
 
 If you want to see every single command that this tool will run on your machine
-during the installation process, you can view [this file](./commands/install-pipeline.go),
-or run `config-manager list` to print the pipeline with its groups and dependencies.
+during the installation process, you can view [this file](./config-manager.sh),
+or run `./config-manager.sh list` to print the pipeline with its groups and dependencies.
 
 Access https://marcos-venicius.github.io/config-manager/ to see more details about the tool.
+
+## Installing the tool
+
+```bash
+git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager
+cd ~/.config-manager
+```
+
+That's it: no language runtime, no build step. `config-manager.sh` is a single bash script and
+`configs/` holds the dotfiles it links.
 
 ## Commands
 
 ```bash
-sudo $(which config-manager) install      # run the pipeline
-sudo $(which config-manager) update       # pull and rebuild what was built from source
-sudo $(which config-manager) uninstall    # remove what this tool created
-config-manager list                       # print the pipeline, touching nothing
+sudo ./config-manager.sh install      # run the pipeline
+sudo ./config-manager.sh update       # pull and rebuild what was built from source
+sudo ./config-manager.sh uninstall    # remove what this tool created
+./config-manager.sh list              # print the pipeline, touching nothing
 ```
 
 `update` only touches the tools built from a git clone (helix, tmuxer, mark): it pulls, rebuilds and
@@ -29,7 +39,7 @@ health checks them. A step that is not installed yet is skipped — that is `ins
 nothing left to remove does not stop it.
 
 It deliberately does **not** touch apt packages, toolchains (`~/.cargo`, `~/.nimble`, `/opt/go`,
-`~/.dotnet`) or the clones in `~/tools`. A dotfile is only unlinked when it still points at this
+`~/.dotnet`, `~/.asdf`) or the clones in `~/tools`. A dotfile is only unlinked when it still points at this
 repository, so a link you repointed somewhere else survives. The `<name>.bak.<timestamp>` copies
 made during install are left where they are — restoring the right one is your call.
 
@@ -38,17 +48,17 @@ made during install are left where they are — restoring the right one is your 
 Every step belongs to one or more groups. Use `-ignore` to skip them:
 
 ```bash
-sudo $(which config-manager) install -ignore desktop,dotnet
+sudo ./config-manager.sh install -ignore desktop,dotnet
 ```
 
-Run `config-manager help` to list the groups.
+Run `./config-manager.sh help` to list the groups.
 
 Dependencies **are** resolved: a step can declare the groups it needs, and ignoring one of those
 also skips everything that depends on it, transitively. Ignoring `cargo` therefore skips `helix`,
 `alacritty` and `mark` as well, and the output says why:
 
 ```
-Step 16/36 (ignored: helix needs cargo): Download & Build Helix
+Step 20/43 (ignored: helix needs cargo): Download & Build Helix
 ```
 
 ## Running a single group
@@ -56,9 +66,9 @@ Step 16/36 (ignored: helix needs cargo): Download & Build Helix
 `-only` is the inverse: it runs the groups you name and skips everything else.
 
 ```bash
-sudo $(which config-manager) install   -only claude
-sudo $(which config-manager) update    -only tmuxer
-sudo $(which config-manager) uninstall -only mark
+sudo ./config-manager.sh install   -only claude
+sudo ./config-manager.sh update    -only tmuxer
+sudo ./config-manager.sh uninstall -only mark
 ```
 
 `install` pulls in whatever the named groups are built on, transitively, so you do not have to
@@ -66,8 +76,8 @@ know the graph. `base` always comes along, since every group assumes apt, curl a
 It tells you what it added:
 
 ```
-$ sudo $(which config-manager) install -only tpm
--only tpm also runs what it needs: base, git, tmux, fzf, jq, configs
+$ sudo ./config-manager.sh install -only tpm
+-only tpm also runs what it needs: base, git, config-manager, tmux, fzf, jq, configs
 ```
 
 Anything already in place is skipped by its health checks, so the extra groups usually cost seconds.
@@ -100,12 +110,6 @@ works wherever the clone lives:
 
 Machine-specific or sensitive settings (passwords, work paths, `KUBECONFIG`, ...) must go in `~/.bashrc.local`,
 which is sourced by `.bashrc` and is **not** versioned.
-
-## Installing the tool
-
-```bash
-go install github.com/marcos-venicius/config-manager@latest
-```
 
 ## Testing during development
 
