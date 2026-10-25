@@ -425,19 +425,19 @@ UNINSTALL_asdf=()
 step asdf "Asdf" "asdf" "" "1"
 
 read -r -d '' CMD_NODE_PLUGIN <<'CMDEOF' || true
-$HOME/.asdf/bin/asdf plugin list | grep -qx nodejs || $HOME/.asdf/bin/asdf plugin add nodejs
+PATH="$HOME/.asdf/bin:$PATH" asdf plugin list | grep -qx nodejs || PATH="$HOME/.asdf/bin:$PATH" asdf plugin add nodejs
 CMDEOF
 read -r -d '' CMD_NODE_INSTALL <<'CMDEOF' || true
-NODE_LATEST=$($HOME/.asdf/bin/asdf latest nodejs) && $HOME/.asdf/bin/asdf install nodejs "$NODE_LATEST"
+NODE_LATEST=$(PATH="$HOME/.asdf/bin:$PATH" asdf latest nodejs) && PATH="$HOME/.asdf/bin:$PATH" asdf install nodejs "$NODE_LATEST" && PATH="$HOME/.asdf/bin:$PATH" asdf reshim nodejs "$NODE_LATEST"
 CMDEOF
 read -r -d '' CMD_NODE_GLOBAL <<'CMDEOF' || true
-NODE_LATEST=$($HOME/.asdf/bin/asdf latest nodejs) && $HOME/.asdf/bin/asdf global nodejs "$NODE_LATEST"
+NODE_LATEST=$(PATH="$HOME/.asdf/bin:$PATH" asdf latest nodejs) && PATH="$HOME/.asdf/bin:$PATH" asdf set -u nodejs "$NODE_LATEST"
 CMDEOF
 read -r -d '' HEALTH_NODE_VERSION <<'CMDEOF' || true
-$HOME/.asdf/bin/asdf exec node --version
+PATH="$HOME/.asdf/bin:$PATH" asdf exec node --version
 CMDEOF
 read -r -d '' UPDATE_NODE_INSTALL <<'CMDEOF' || true
-NODE_LATEST=$($HOME/.asdf/bin/asdf latest nodejs) && $HOME/.asdf/bin/asdf install nodejs "$NODE_LATEST" && $HOME/.asdf/bin/asdf global nodejs "$NODE_LATEST"
+NODE_LATEST=$(PATH="$HOME/.asdf/bin:$PATH" asdf latest nodejs) && PATH="$HOME/.asdf/bin:$PATH" asdf install nodejs "$NODE_LATEST" && PATH="$HOME/.asdf/bin:$PATH" asdf reshim nodejs "$NODE_LATEST" && PATH="$HOME/.asdf/bin:$PATH" asdf set -u nodejs "$NODE_LATEST"
 CMDEOF
 
 CMDS_node=(
