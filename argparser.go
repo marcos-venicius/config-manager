@@ -79,7 +79,7 @@ func (a *arguments_t) Parse() *arguments_t {
 			}
 
 			a.only = appendGroups(a.only, value)
-		case "install", "update", "uninstall", "list", "version", "help":
+		case "install", "update", "uninstall", "list", "version", "help", "test":
 			a.command = arg
 		}
 	}

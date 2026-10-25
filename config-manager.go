@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/marcos-venicius/config-manager/commands"
+	"github.com/marcos-venicius/config-manager/lang"
 )
 
 func main() {
@@ -16,6 +17,9 @@ func main() {
 	switch args.command {
 	case "version":
 		fmt.Println(VERSION)
+	case "test":
+		bts, _ := os.ReadFile("./pipelines/install.pipe")
+		lang.Run(string(bts))
 	case "install":
 		commands.Install(args.ignore, args.only)
 	case "update":
