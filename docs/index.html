@@ -188,18 +188,18 @@
         </p>
         <div class="install">
           <pre id="install-cmd"><span class="p">$ </span>git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager
-<span class="p">$ </span>cd ~/.config-manager &amp;&amp; go install .
-<span class="p">$ </span>sudo ~/go/bin/config-manager install</pre>
+<span class="p">$ </span>cd ~/.config-manager
+<span class="p">$ </span>sudo ./config-manager.sh install</pre>
           <button class="copy" id="copy">Copy</button>
         </div>
         <div class="cta">
           <a class="btn primary" href="https://github.com/marcos-venicius/config-manager">★ View on GitHub</a>
-          <a class="btn ghost" href="https://github.com/marcos-venicius/config-manager/blob/main/commands/install-pipeline.go">Read every command it runs</a>
+          <a class="btn ghost" href="https://github.com/marcos-venicius/config-manager/blob/main/config-manager.sh">Read every command it runs</a>
         </div>
       </div>
 
       <div class="term" aria-label="Example installation output">
-        <div class="term-bar"><i></i><i></i><i></i><span>sudo config-manager install -ignore dotnet</span></div>
+        <div class="term-bar"><i></i><i></i><i></i><span>sudo ./config-manager.sh install -ignore dotnet</span></div>
         <div class="term-body" id="term"></div>
       </div>
     </div>
@@ -268,7 +268,7 @@
       </div>
       <div class="ignore-demo">
         <span>Setting up a headless box?</span>
-        <pre>sudo config-manager install -ignore desktop,alacritty</pre>
+        <pre>sudo ./config-manager.sh install -ignore desktop,alacritty</pre>
       </div>
       <p class="section-lead" style="margin: 14px 0 0;">Ignoring a group also skips everything that needs it, so <code>-ignore cargo</code> takes <code>helix</code>, <code>alacritty</code> and <code>mark</code> with it.</p>
     </section>
@@ -371,18 +371,18 @@ $ <span class="t-dim">█</span></div>
 
     <section id="how">
       <h2>How it works</h2>
-      <p class="section-lead">A small Go binary that runs a readable list of shell steps. No DSL and no magic, so you can audit it in five minutes.</p>
+      <p class="section-lead">A single bash script that runs a readable list of shell steps. No DSL, no runtime to install first, no magic, so you can audit it in five minutes.</p>
       <div class="steps">
         <div class="step">
           <h3>Declare the steps</h3>
           <p>Each step has a label, groups, commands and health checks, and can name the groups it needs. Adding a tool takes a few lines.</p>
-          <pre>{
-  label:    "Download &amp; Build Tmuxer",
-  groups:   []string{"tmuxer"},
-  requires: []string{"nim", "git"},
-  commands: []string{"... nimble build -d:release -y"},
-  healthCheckCommands: []string{"tmuxer -h"},
-}</pre>
+          <pre>CMDS_tmuxer=(
+  "... nimble build -d:release -y"
+)
+HEALTH_tmuxer=(
+  "tmuxer -h"
+)
+step tmuxer "Download &amp; Build Tmuxer" "tmuxer" "nim git" "1"</pre>
         </div>
         <div class="step">
           <h3>Check before acting</h3>
