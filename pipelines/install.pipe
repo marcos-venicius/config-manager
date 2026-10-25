@@ -1,40 +1,36 @@
-step@unix {
+step@linux {
 	label: "system update"
 	groups: ["base"]
 
-	up !<<{
+	up: !<<{
 		sudo apt-get update -y
 		sudo apt-get upgrade -y
 	>>}
 }
 
-step@unix {
+step@linux {
 	label: "Util Linux Extra"
 	groups: ["base"]
 
-	health !<<{
-		which newgrp
-	>>}
-
-	up !<<{
+	up: !<<{
 		sudo apt-get install util-linux-extra -y
 	>>}
 
-	down !<<{
+	health: !<<{
+		which newgrp
+	>>}
+
+	down: !<<{
 		sudo apt-get remove util-linux-extra -y
 	>>}
 }
 
-step@unix {
+step@linux {
 	label: "Install Docker"
 	groups: ["docker"]
 	requires: ["base"]
 
-	health !<<{
-		which docker
-	>>}
-
-	up !<<{
+	up: !<<{
 		sudo apt-get remove $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc docker-buildx podman-docker containerd runc | cut -f1) -y	
 		sudo install -m 0755 -d /etc/apt/keyrings
 		sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -56,12 +52,47 @@ step@unix {
 		sudo usermod -aG docker $(logname) || :
 	>>}
 
-	down !<<{
+	health: !<<{
+		which docker
+	>>}
+
+	down: !<<{
 		sudo systemctl disable docker
 		sudo apt purge docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-ce-rootless-extras
 		sudo rm -rf /var/lib/docker
 		sudo rm -rf /var/lib/containerd
 		sudo rm /etc/apt/sources.list.d/docker.sources
 		sudo rm /etc/apt/keyrings/docker.asc
+	>>}
+}
+
+step@linux {
+	label: "Link configs"
+	groups: ["configs"]
+	requires: ["config-manager"]
+
+	up: !<<{
+		configs=(
+		    ".bashrc|$HOME/.bashrc"
+		    ".gitconfig|$HOME/.gitconfig"
+		    ".tmux.conf|$HOME/.tmux.conf"
+		    "alacritty|$HOME/.config/alacritty"
+		    "helix/config.toml|$HOME/.config/helix/config.toml"
+		    "helix/languages.toml|$HOME/.config/helix/languages.toml"
+		)
+
+		for config in "${configs[@]}"; do
+		    src="${config%%|*}"
+		    destination="${config#*|}"
+
+		    target="#[CONFIG_MANAGER_DIR]/$src"
+
+		    test -e "$target" &&
+		        mkdir -p "$(dirname "$destination")" &&
+		        if [ -e "$destination" ] && [ ! -L "$destination" ]; then
+		            mv "$destination" "$destination.bak.$(date +%s)"
+		        fi &&
+		        ln -sfn "$target" "$destination"
+		done
 	>>}
 }
