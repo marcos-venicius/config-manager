@@ -187,9 +187,8 @@
           and applies your desktop preferences. Safe to re-run, and every step is health-checked.
         </p>
         <div class="install">
-          <pre id="install-cmd"><span class="p">$ </span>git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager
-<span class="p">$ </span>cd ~/.config-manager
-<span class="p">$ </span>sudo ./config-manager.sh install</pre>
+          <pre id="install-cmd"><span class="p">$ </span>git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager &amp;&amp; sudo ln -sf $HOME/.config-manager/config-manager.sh /usr/local/bin/config-manager
+<span class="p">$ </span>sudo config-manager install</pre>
           <button class="copy" id="copy">Copy</button>
         </div>
         <div class="cta">
@@ -199,7 +198,7 @@
       </div>
 
       <div class="term" aria-label="Example installation output">
-        <div class="term-bar"><i></i><i></i><i></i><span>sudo ./config-manager.sh install -ignore dotnet</span></div>
+        <div class="term-bar"><i></i><i></i><i></i><span>sudo config-manager install -ignore dotnet</span></div>
         <div class="term-body" id="term"></div>
       </div>
     </div>
@@ -261,6 +260,7 @@
         <div class="group"><header><strong>Nim</strong><span class="tag">nim</span></header><p>Via choosenim</p></div>
         <div class="group"><header><strong>Tmuxer</strong><span class="tag">tmuxer</span></header><p>My tmux session setup tool, built from source</p></div>
         <div class="group"><header><strong>Mark</strong><span class="tag">mark</span></header><p>My Markdown viewer, registered as the default <code>.md</code> handler</p></div>
+        <div class="group"><header><strong>Mca</strong><span class="tag">mca</span></header><p>My programming language, built from source</p></div>
         <div class="group"><header><strong>Claude Code</strong><span class="tag">claude</span></header><p>The native install into <code>~/.local/bin</code>, which keeps itself updated</p></div>
         <div class="group"><header><strong>Claude Hatch</strong><span class="tag">claude-hatch</span></header><p>The Claude Code side of tmux-claude-hatch: bell forwarding and session cache refresh, plus <code>preferredNotifChannel</code> and <code>messageIdleNotifThresholdMs</code> merged into your existing Claude settings so the bell rings as soon as a turn ends</p></div>
         <div class="group"><header><strong>kubectl</strong><span class="tag">kubectl</span></header><p>From the official Kubernetes apt repository</p></div>
@@ -269,7 +269,7 @@
       </div>
       <div class="ignore-demo">
         <span>Setting up a headless box?</span>
-        <pre>sudo ./config-manager.sh install -ignore desktop,alacritty</pre>
+        <pre>sudo config-manager install -ignore desktop,alacritty</pre>
       </div>
       <p class="section-lead" style="margin: 14px 0 0;">Ignoring a group also skips everything that needs it, so <code>-ignore cargo</code> takes <code>helix</code>, <code>alacritty</code> and <code>mark</code> with it.</p>
     </section>

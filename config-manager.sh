@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # config-manager: one script that turns a fresh Ubuntu install into a ready-to-code
-# machine. Run `./config-manager.sh help` for usage.
+# machine. Run `config-manager help` for usage.
 set -u
 set -o pipefail
 
@@ -252,6 +252,16 @@ UNINSTALL_configmanager=(
 	'rm -rf ~/.config-manager'
 )
 step configmanager "Config Manager" "config-manager" "" "1"
+
+# nothing to install: the link comes from the install command in the README.
+# it needs root to go away, which the step above does not have.
+CMDS_configmanagerlink=()
+HEALTH_configmanagerlink=()
+UPDATE_configmanagerlink=()
+UNINSTALL_configmanagerlink=(
+	'[ ! -L /usr/local/bin/config-manager ] || rm -f /usr/local/bin/config-manager'
+)
+step configmanagerlink "Config Manager link" "config-manager" "" "0"
 
 CMDS_kubectl=(
 	'apt-get install ca-certificates gnupg -y'
@@ -566,6 +576,34 @@ UNINSTALL_mark=(
 	'! [ -x $HOME/tools/mark/uninstall.sh ] || (cd $HOME/tools/mark && ./uninstall.sh)'
 )
 step mark "Download & Install Mark" "mark" "cargo git" "1"
+
+CMDS_buildmca=(
+	'mkdir -p $HOME/tools'
+	'[ -d $HOME/tools/mca ] || git clone --depth 1 https://github.com/marcos-venicius/mca.git $HOME/tools/mca'
+	'cd $HOME/tools/mca && PATH=/opt/go/bin:$PATH make deploy'
+)
+HEALTH_buildmca=(
+	'$HOME/tools/mca/bin/mca -h'
+)
+UPDATE_buildmca=(
+	'cd $HOME/tools/mca && git pull --ff-only'
+	'cd $HOME/tools/mca && PATH=/opt/go/bin:$PATH make deploy'
+)
+UNINSTALL_buildmca=()
+step buildmca "Download & Build Mca" "mca" "go git" "1"
+
+CMDS_installmca=(
+	'ln -sf "$(getent passwd "$SUDO_USER" | cut -d: -f6)/tools/mca/bin/mca" /usr/local/bin/mca'
+)
+HEALTH_installmca=(
+	'[ "$(readlink /usr/local/bin/mca)" = "$HOME/tools/mca/bin/mca" ]'
+	'mca -h'
+)
+UPDATE_installmca=()
+UNINSTALL_installmca=(
+	'rm -f /usr/local/bin/mca'
+)
+step installmca "Install Mca" "mca" "" "0"
 
 CMDS_claude=(
 	'curl -fsSL https://claude.ai/install.sh > /tmp/claude-install.sh'
@@ -1122,7 +1160,8 @@ resolve_configs_dir() {
 
 # next to the script, not in ~/.config-manager: that folder may not exist yet
 # during install, and creating it would make the clone step fail.
-LOCK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+# readlink: the script usually runs through the /usr/local/bin/config-manager link.
+LOCK_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 LOCK_FILE="$LOCK_DIR/config-manager.lock"
 
 declare -A LOCK_ENTRIES=()
@@ -1199,7 +1238,7 @@ run_pipeline() {
 		if ! resolve_configs_dir; then
 			printf "fatal: no configs directory found at '%s/configs'\n" "$CONFIGS_BASE_DIR"
 			printf '       run %s from the repository, or point CONFIG_MANAGER_DIR at it:\n' "$mode_name"
-			printf '       sudo CONFIG_MANAGER_DIR=/path/to/config-manager ./config-manager.sh %s\n' "$mode_name"
+			printf '       sudo CONFIG_MANAGER_DIR=/path/to/config-manager config-manager %s\n' "$mode_name"
 			exit 1
 		fi
 	fi

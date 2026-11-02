@@ -7,15 +7,14 @@
 
 If you want to see every single command that this tool will run on your machine
 during the installation process, you can view [this file](./config-manager.sh),
-or run `./config-manager.sh list` to print the pipeline with its groups and dependencies.
+or run `config-manager list` to print the pipeline with its groups and dependencies.
 
 Access https://marcos-venicius.github.io/config-manager/ to see more details about the tool.
 
 ## Installing the tool
 
 ```bash
-git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager
-cd ~/.config-manager
+git clone https://github.com/marcos-venicius/config-manager.git ~/.config-manager && sudo ln -sf $HOME/.config-manager/config-manager.sh /usr/local/bin/config-manager
 ```
 
 That's it: no language runtime, no build step. `config-manager.sh` is a single bash script and
@@ -24,13 +23,13 @@ That's it: no language runtime, no build step. `config-manager.sh` is a single b
 ## Commands
 
 ```bash
-sudo ./config-manager.sh install      # run the pipeline
-sudo ./config-manager.sh update       # pull and rebuild what was built from source
-sudo ./config-manager.sh uninstall    # remove what this tool created
-./config-manager.sh list              # print the pipeline, touching nothing
+sudo config-manager install      # run the pipeline
+sudo config-manager update       # pull and rebuild what was built from source
+sudo config-manager uninstall    # remove what this tool created
+config-manager list              # print the pipeline, touching nothing
 ```
 
-`update` only touches the tools built from a git clone (helix, tmuxer, mark): it pulls, rebuilds and
+`update` only touches the tools built from a git clone (helix, tmuxer, mark, mca): it pulls, rebuilds and
 health checks them. A step that is not installed yet is skipped — that is `install`'s job.
 
 `uninstall` removes **only what this tool created**: the `/usr/local/bin` symlinks, the
@@ -53,10 +52,10 @@ made during install are left where they are — restoring the right one is your 
 Every step belongs to one or more groups. Use `-ignore` to skip them:
 
 ```bash
-sudo ./config-manager.sh install -ignore desktop,dotnet
+sudo config-manager install -ignore desktop,dotnet
 ```
 
-Run `./config-manager.sh help` to list the groups.
+Run `config-manager help` to list the groups.
 
 Dependencies **are** resolved: a step can declare the groups it needs, and ignoring one of those
 also skips everything that depends on it, transitively. Ignoring `cargo` therefore skips `helix`,
@@ -71,9 +70,9 @@ Step 20/43 (ignored: helix needs cargo): Download & Build Helix
 `-only` is the inverse: it runs the groups you name and skips everything else.
 
 ```bash
-sudo ./config-manager.sh install   -only claude
-sudo ./config-manager.sh update    -only tmuxer
-sudo ./config-manager.sh uninstall -only mark
+sudo config-manager install   -only claude
+sudo config-manager update    -only tmuxer
+sudo config-manager uninstall -only mark
 ```
 
 `install` pulls in whatever the named groups are built on, transitively, so you do not have to
@@ -81,7 +80,7 @@ know the graph. `base` always comes along, since every group assumes apt, curl a
 It tells you what it added:
 
 ```
-$ sudo ./config-manager.sh install -only tpm
+$ sudo config-manager install -only tpm
 -only tpm also runs what it needs: base, git, config-manager, tmux, fzf, jq, configs
 ```
 
