@@ -251,7 +251,7 @@
         <div class="group"><header><strong>Ripgrep</strong><span class="tag">ripgrep</span></header><p>Fast recursive search</p></div>
         <div class="group"><header><strong>Clipboard</strong><span class="tag">clipboard</span></header><p>xclip and wl-clipboard: tmux copies on X11 and Wayland</p></div>
         <div class="group"><header><strong>Tmux</strong><span class="tag">tmux</span></header><p>With vi copy mode and pane navigation</p></div>
-        <div class="group"><header><strong>Tmux plugins</strong><span class="tag">tpm</span></header><p>tpm plus Catppuccin and claude-hatch (with fzf and jq), installed without opening tmux</p></div>
+        <div class="group"><header><strong>Tmux plugins</strong><span class="tag">tpm</span></header><p>tpm plus claude-hatch (with fzf and jq), installed without opening tmux</p></div>
         <div class="group"><header><strong>Rust</strong><span class="tag">cargo</span></header><p>rustup and cargo, used to build Helix and Alacritty</p></div>
         <div class="group"><header><strong>Helix</strong><span class="tag">helix</span></header><p>Built from source from my fork, <a href="https://github.com/marcos-venicius/helix">marcos-venicius/helix</a> (branch <code>marcos</code>: upstream plus my own features), with grammars, set as <code>editor</code> and <code>vi</code>. Every vim/neovim package is removed.</p></div>
         <div class="group"><header><strong>Alacritty</strong><span class="tag">alacritty</span></header><p>Default terminal everywhere: x-terminal-emulator, xdg, GNOME and COSMIC</p></div>
@@ -263,7 +263,7 @@
         <div class="group"><header><strong>Claude Code</strong><span class="tag">claude</span></header><p>The native install into <code>~/.local/bin</code>, which keeps itself updated</p></div>
         <div class="group"><header><strong>Claude Hatch</strong><span class="tag">claude-hatch</span></header><p>The Claude Code side of tmux-claude-hatch: bell forwarding and session cache refresh, plus <code>preferredNotifChannel</code> and <code>messageIdleNotifThresholdMs</code> merged into your existing Claude settings so the bell rings as soon as a turn ends</p></div>
         <div class="group"><header><strong>kubectl</strong><span class="tag">kubectl</span></header><p>From the official Kubernetes apt repository</p></div>
-        <div class="group"><header><strong>Dotfiles</strong><span class="tag">configs</span></header><p>bash, git, tmux, Alacritty and Helix configs linked into <code>$HOME</code></p></div>
+        <div class="group"><header><strong>Dotfiles</strong><span class="tag">configs</span></header><p>bash, git, tmux, Alacritty and Helix configs linked into <code>$HOME</code>, with themes that follow the system</p></div>
         <div class="group"><header><strong>GNOME desktop</strong><span class="tag">desktop</span></header><p>Alt+Tab limited to the current workspace, workspaces spanning every monitor, a per-workspace dock</p></div>
       </div>
       <div class="ignore-demo">
@@ -298,13 +298,13 @@
             <li>Bells, activity warnings and visual noise all off</li>
             <li><code>escape-time 0</code>, so <kbd>Esc</kbd> is never swallowed on its way to the editor</li>
             <li>Windows keep the name you gave them (<code>allow-rename off</code>)</li>
-            <li>Catppuccin Mocha through <code>catppuccin/tmux</code>, with the date and clock on the right</li>
+            <li>Status line themed by the system color scheme, with the date and clock on the right</li>
           </ul>
         </div>
 
         <div class="config">
           <header><h3>Helix</h3><span class="path">configs/helix/*.toml</span></header>
-          <p>Catppuccin Mocha, relative line numbers, and it saves itself a second after you stop typing.</p>
+          <p>Follows the system theme, relative line numbers, and it saves itself a second after you stop typing.</p>
           <div class="binds">
             <div class="bind"><span><kbd>space B</kbd></span><em><code>git blame</code> for the line under the cursor</em></div>
             <div class="bind"><span><kbd>space M</kbd></span><em>Open the buffer in <a href="https://github.com/marcos-venicius/mark">mark</a></em></div>
@@ -323,7 +323,7 @@
 
         <div class="config">
           <header><h3>Alacritty</h3><span class="path">configs/alacritty/alacritty.toml</span></header>
-          <p>JetBrainsMono Nerd Font at size 9, Catppuccin Mocha, and nothing else in the way.</p>
+          <p>JetBrainsMono Nerd Font at size 9, the system theme, and nothing else in the way.</p>
           <div class="binds">
             <div class="bind"><span><kbd>Shift+Enter</kbd></span><em>Sends <code>ESC CR</code>, so a REPL or an editor can tell it apart from a plain <kbd>Enter</kbd></em></div>
           </div>
@@ -332,6 +332,20 @@
             <li>Dynamic title off, so tmux keeps the title it set</li>
             <li>Pointer hides itself while you type</li>
             <li><code>TERM=alacritty</code>, which is the name the <code>terminal-overrides</code> line in <code>.tmux.conf</code> matches to turn on true colour</li>
+          </ul>
+        </div>
+
+        <div class="config">
+          <header><h3>System theme</h3><span class="path">configs/theme</span></header>
+          <p>Alacritty, tmux and Helix follow the GNOME color scheme live, including whatever is already open: GitHub Light in light mode, Kanagawa in dark mode.</p>
+          <div class="binds">
+            <div class="bind"><span><kbd>system-theme apply</kbd></span><em>Apply the current mode once, after editing a theme</em></div>
+          </div>
+          <ul class="bullets">
+            <li>A user service watches GNOME, because Alacritty doesn't pass theme changes on to tmux or Helix</li>
+            <li>Sources in <code>configs/theme/light</code> and <code>dark</code>, generated active files outside the repository, so switching never dirties it</li>
+            <li>Alacritty reloads by itself, tmux through <code>source-file</code>, Helix through <code>SIGUSR1</code></li>
+            <li>The service starts at the next login after install</li>
           </ul>
         </div>
 

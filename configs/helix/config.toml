@@ -7,7 +7,9 @@
 # theme = "gruvbox_dark_hard"
 # theme = "catppuccin_mocha"
 # theme = "everforest_dark"
-theme = "kanagawa"
+# theme = "kanagawa"
+# github_light or kanagawa, system-theme writes it to ~/.config/helix/themes/system.toml
+theme = "system"
 
 [editor]
 line-number = "relative"

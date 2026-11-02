@@ -1,0 +1,11 @@
+[Unit]
+Description=Keep alacritty, tmux and helix on the GNOME color scheme
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecStart=%h/.local/bin/system-theme watch
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

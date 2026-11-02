@@ -1,0 +1,61 @@
+# =============================================================
+# GitHub Light - https://github.com/projekt0n/github-nvim-theme
+# =============================================================
+
+[colors.primary]
+background        = "#FFFFFF"
+foreground        = "#1F2328"
+dim_foreground    = "#59636E"
+bright_foreground = "#1F2328"
+
+[colors.cursor]
+text   = "#FFFFFF"
+cursor = "#0969DA"
+
+[colors.vi_mode_cursor]
+text   = "#FFFFFF"
+cursor = "#8250DF"
+
+[colors.selection]
+text       = "#1F2328"
+background = "#B6E3FF"
+
+[colors.search.matches]
+foreground = "#1F2328"
+background = "#FAE17D"
+
+[colors.search.focused_match]
+foreground = "#FFFFFF"
+background = "#1A7F37"
+
+[colors.footer_bar]
+foreground = "#1F2328"
+background = "#EAEEF2"
+
+[colors.hints.start]
+foreground = "#1F2328"
+background = "#FAE17D"
+
+[colors.hints.end]
+foreground = "#1F2328"
+background = "#EAEEF2"
+
+[colors.normal]
+black   = "#24292F"
+red     = "#CF222E"
+green   = "#116329"
+yellow  = "#4D2D00"
+blue    = "#0969DA"
+magenta = "#8250DF"
+cyan    = "#1B7C83"
+white   = "#6E7781"
+
+[colors.bright]
+black   = "#57606A"
+red     = "#A40E26"
+green   = "#1A7F37"
+yellow  = "#633C01"
+blue    = "#218BFF"
+magenta = "#A475F9"
+cyan    = "#3192AA"
+white   = "#8C959F"

@@ -577,6 +577,8 @@ CMDS_linkconfigs=(
 	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/alacritty"; dst="$HOME/.config/alacritty"; test -e "$target" && mkdir -p "$(dirname "$dst")" && if [ -e "$dst" ] && [ ! -L "$dst" ]; then mv "$dst" "$dst.bak.$(date +%s)"; fi && ln -sfn "$target" "$dst"'
 	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/helix/config.toml"; dst="$HOME/.config/helix/config.toml"; test -e "$target" && mkdir -p "$(dirname "$dst")" && if [ -e "$dst" ] && [ ! -L "$dst" ]; then mv "$dst" "$dst.bak.$(date +%s)"; fi && ln -sfn "$target" "$dst"'
 	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/helix/languages.toml"; dst="$HOME/.config/helix/languages.toml"; test -e "$target" && mkdir -p "$(dirname "$dst")" && if [ -e "$dst" ] && [ ! -L "$dst" ]; then mv "$dst" "$dst.bak.$(date +%s)"; fi && ln -sfn "$target" "$dst"'
+	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/theme/system-theme"; dst="$HOME/.local/bin/system-theme"; test -e "$target" && mkdir -p "$(dirname "$dst")" && if [ -e "$dst" ] && [ ! -L "$dst" ]; then mv "$dst" "$dst.bak.$(date +%s)"; fi && ln -sfn "$target" "$dst"'
+	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/theme/system-theme.service"; dst="$HOME/.config/systemd/user/system-theme.service"; test -e "$target" && mkdir -p "$(dirname "$dst")" && if [ -e "$dst" ] && [ ! -L "$dst" ]; then mv "$dst" "$dst.bak.$(date +%s)"; fi && ln -sfn "$target" "$dst"'
 )
 HEALTH_linkconfigs=(
 	'grep -qx "SELECTED_EDITOR=\"/usr/local/bin/hx\"" $HOME/.selected_editor'
@@ -586,6 +588,8 @@ HEALTH_linkconfigs=(
 	'[ "$(readlink "$HOME/.config/alacritty")" = "${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/alacritty" ]'
 	'[ "$(readlink "$HOME/.config/helix/config.toml")" = "${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/helix/config.toml" ]'
 	'[ "$(readlink "$HOME/.config/helix/languages.toml")" = "${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/helix/languages.toml" ]'
+	'[ "$(readlink "$HOME/.local/bin/system-theme")" = "${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/theme/system-theme" ]'
+	'[ "$(readlink "$HOME/.config/systemd/user/system-theme.service")" = "${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/theme/system-theme.service" ]'
 )
 UPDATE_linkconfigs=()
 UNINSTALL_linkconfigs=(
@@ -596,8 +600,26 @@ UNINSTALL_linkconfigs=(
 	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/alacritty"; dst="$HOME/.config/alacritty"; ! [ "$(readlink "$dst")" = "$target" ] || rm -f "$dst"'
 	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/helix/config.toml"; dst="$HOME/.config/helix/config.toml"; ! [ "$(readlink "$dst")" = "$target" ] || rm -f "$dst"'
 	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/helix/languages.toml"; dst="$HOME/.config/helix/languages.toml"; ! [ "$(readlink "$dst")" = "$target" ] || rm -f "$dst"'
+	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/theme/system-theme"; dst="$HOME/.local/bin/system-theme"; ! [ "$(readlink "$dst")" = "$target" ] || rm -f "$dst"'
+	'target="${CONFIG_MANAGER_DIR:-$HOME/.config-manager}/configs/theme/system-theme.service"; dst="$HOME/.config/systemd/user/system-theme.service"; ! [ "$(readlink "$dst")" = "$target" ] || rm -f "$dst"'
 )
 step linkconfigs "Link configs" "configs" "config-manager" "1"
+
+# alacritty, tmux and helix follow the GNOME color scheme, see configs/theme.
+# the service starts at the next login
+CMDS_systemtheme=(
+	'$HOME/.local/bin/system-theme apply'
+	'mkdir -p $HOME/.config/systemd/user/graphical-session.target.wants && ln -sfn ../system-theme.service $HOME/.config/systemd/user/graphical-session.target.wants/system-theme.service'
+)
+HEALTH_systemtheme=(
+	'[ -f $HOME/.local/state/system-theme/alacritty.toml ]'
+	'[ -L $HOME/.config/systemd/user/graphical-session.target.wants/system-theme.service ]'
+)
+UPDATE_systemtheme=()
+UNINSTALL_systemtheme=(
+	'rm -f $HOME/.config/systemd/user/graphical-session.target.wants/system-theme.service'
+)
+step systemtheme "Follow system theme" "configs" "linkconfigs" "1"
 
 CMDS_tpm=(
 	'mkdir -p $HOME/.tmux/plugins'

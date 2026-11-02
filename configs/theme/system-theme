@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+#
+# Keeps alacritty, tmux and helix on the GNOME color scheme.
+#
+#   system-theme watch   apply now, then follow every change (the systemd service)
+#   system-theme apply   apply once
+#
+# None of the three can do this alone: alacritty does not implement mode 2031,
+# so helix and tmux never hear about a change from the terminal.
+set -eu
+
+themes="$(dirname "$(readlink -f "$0")")"
+# alacritty.toml and .tmux.conf name these paths literally, keep them in sync
+state="$HOME/.local/state/system-theme"
+helix="$HOME/.config/helix/themes"
+
+current_mode() {
+	# "default" and "prefer-light" are both light
+	case "$(gsettings get org.gnome.desktop.interface color-scheme 2>/dev/null)" in
+		*prefer-dark*) echo dark ;;
+		*) echo light ;;
+	esac
+}
+
+# rename, so alacritty's file watcher never reads a half written file
+install_file() {
+	cmp -s "$1" "$2" && return 0
+	cp "$1" "$2.tmp"
+	mv "$2.tmp" "$2"
+}
+
+reload_tmux() {
+	local socket
+	for socket in "/tmp/tmux-$(id -u)"/*; do
+		[ -S "$socket" ] || continue
+		tmux -S "$socket" source-file "$state/tmux.conf" 2>/dev/null || true
+	done
+}
+
+reload_helix() {
+	# hx is also installed as h. USR1 kills anything that doesn't handle it, so
+	# check the binary too, the name alone is not enough
+	local pid
+	for pid in $(pgrep -u "$(id -u)" -x 'hx|h' || true); do
+		case "$(readlink "/proc/$pid/exe" || true)" in
+			*/hx | */hx' (deleted)') kill -USR1 "$pid" || true ;;
+		esac
+	done
+}
+
+apply() {
+	local mode
+	mode="$(current_mode)"
+	mkdir -p "$state" "$helix"
+	install_file "$themes/$mode/alacritty.toml" "$state/alacritty.toml"
+	install_file "$themes/$mode/tmux.conf" "$state/tmux.conf"
+	install_file "$themes/$mode/helix.toml" "$helix/system.toml"
+	reload_tmux
+	reload_helix
+}
+
+case "${1:-}" in
+	apply)
+		apply
+		;;
+	watch)
+		apply
+		gsettings monitor org.gnome.desktop.interface color-scheme | while read -r _; do
+			apply
+		done
+		;;
+	*)
+		echo "usage: system-theme apply|watch" >&2
+		exit 1
+		;;
+esac

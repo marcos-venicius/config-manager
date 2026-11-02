@@ -100,7 +100,8 @@ The `desktop` group applies my GNOME preferences:
 ## Configs
 
 The files inside [configs](./configs) are **symlinked** into your home (`~/.bashrc`, `~/.gitconfig`, `~/.tmux.conf`,
-`~/.config/alacritty`, `~/.config/helix/*.toml`), so editing them on the system edits the repository.
+`~/.config/alacritty`, `~/.config/helix/*.toml`, `~/.local/bin/system-theme`), so editing them on the system edits the
+repository.
 
 If a regular file/folder already exists in the destination, it is moved to `<name>.bak.<timestamp>` first.
 
@@ -110,6 +111,43 @@ works wherever the clone lives:
 
 Machine-specific or sensitive settings (passwords, work paths, `KUBECONFIG`, ...) must go in `~/.bashrc.local`,
 which is sourced by `.bashrc` and is **not** versioned.
+
+## System theme
+
+Alacritty, tmux and Helix follow the GNOME color scheme, live, including the windows and sessions already open:
+
+| GNOME `color-scheme`        | Theme        |
+| --------------------------- | ------------ |
+| `prefer-dark`               | Kanagawa     |
+| `default` or `prefer-light` | GitHub Light |
+
+The terminal can't carry this on its own: Alacritty does not implement mode 2031, so tmux and Helix never hear about
+a change from it. Instead, the `system-theme` user service watches the GNOME setting and, on every change:
+
+| Tool      | Active file                                 | How it reloads                                  |
+| --------- | ------------------------------------------- | ----------------------------------------------- |
+| Alacritty | `~/.local/state/system-theme/alacritty.toml` | Its own config watcher, through `general.import` |
+| tmux      | `~/.local/state/system-theme/tmux.conf`      | `source-file` on every running tmux server       |
+| Helix     | `~/.config/helix/themes/system.toml`         | `SIGUSR1` to every running `hx`                  |
+
+The active files are generated and live outside the repository, so switching themes never dirties it. The versioned
+sources are in [configs/theme](./configs/theme), one folder per mode (`light/` and `dark/`). To change a theme, edit
+them and run:
+
+```bash
+system-theme apply    # apply the current mode once
+```
+
+The `Follow system theme` step (group `configs`) writes the active files and enables the service, which starts at the
+next login. To start it right away:
+
+```bash
+systemctl --user start system-theme.service
+```
+
+- Only GNOME is supported. Without a readable `color-scheme`, the tools stay on the light theme.
+- `:theme` in Helix lasts until the next system change.
+- `uninstall` stops the service from starting at login. It doesn't stop a running one or delete the generated files.
 
 ## Testing during development
 
