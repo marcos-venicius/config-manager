@@ -790,6 +790,15 @@ UPDATE_desktopworkspaces=()
 UNINSTALL_desktopworkspaces=()
 step desktopworkspaces "GNOME workspaces & Alt+Tab" "desktop" "" "1"
 
+CMDS_desktopwallpaper=(
+	"${GNOME_SESSION}gsettings set org.gnome.desktop.background picture-uri \"file://\${CONFIG_MANAGER_DIR:-\$HOME/.config-manager}/configs/wallpapers/white-wallpaper.jpg\""
+	"${GNOME_SESSION}gsettings set org.gnome.desktop.background picture-uri-dark \"file://\${CONFIG_MANAGER_DIR:-\$HOME/.config-manager}/configs/wallpapers/manuej-Vor.jpg\""
+)
+HEALTH_desktopwallpaper=()
+UPDATE_desktopwallpaper=()
+UNINSTALL_desktopwallpaper=()
+step desktopwallpaper "GNOME wallpapers" "desktop" "" "1"
+
 CMDS_desktopterminal=(
 	"${GNOME_SESSION}gsettings set org.gnome.desktop.default-applications.terminal exec \$HOME/.cargo/bin/alacritty"
 	"${GNOME_SESSION}gsettings set org.gnome.desktop.default-applications.terminal exec-arg -e"

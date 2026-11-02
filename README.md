@@ -96,6 +96,7 @@ The `desktop` group applies my GNOME preferences:
 - The dock only shows apps from the current workspace
 - Alt+Tab switches windows, Super+Tab switches applications
 - Alacritty as the default terminal
+- A wallpaper for each color scheme, which GNOME switches by itself: [white-wallpaper.jpg](./configs/wallpapers/white-wallpaper.jpg) in light mode, [manuej-Vor.jpg](./configs/wallpapers/manuej-Vor.jpg) in dark mode. `manuej-Vor.jpg` comes from the Ubuntu `ubuntu-wallpapers` package, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), not this repository's license
 
 ## Configs
 
