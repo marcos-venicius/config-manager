@@ -38,8 +38,13 @@ health checks them. A step that is not installed yet is skipped — that is `ins
 `cargo uninstall alacritty`. It runs the pipeline backwards and is best effort, so a command with
 nothing left to remove does not stop it.
 
-It deliberately does **not** touch apt packages, toolchains (`~/.cargo`, `~/.nimble`, `/opt/go`,
-`~/.dotnet`, `~/.asdf`) or the clones in `~/tools`. A dotfile is only unlinked when it still points at this
+The standalone apt tools (`ripgrep`, `xclip`, `wl-clipboard`, `tmux`, `fzf`, `jq`, `btop`) are removed only if
+this tool installed them. `install` records each one it really ran in `config-manager.lock`, next to the script
+and ignored by git, so a package that was already on the machine stays. Uninstall one that is not recorded and
+the step is skipped.
+
+It deliberately does **not** touch the other apt packages (except `docker` and `util-linux-extra`), toolchains
+(`~/.cargo`, `~/.nimble`, `/opt/go`, `~/.dotnet`, `~/.asdf`) or the clones in `~/tools`. A dotfile is only unlinked when it still points at this
 repository, so a link you repointed somewhere else survives. The `<name>.bak.<timestamp>` copies
 made during install are left where they are — restoring the right one is your call.
 

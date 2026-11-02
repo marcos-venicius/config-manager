@@ -24,7 +24,11 @@ CLR_RESET=$'\033[0m'
 # ---------------------------------------------------------------------------
 # a step is registered by defining CMDS_<id>, HEALTH_<id>, UPDATE_<id> and
 # UNINSTALL_<id> arrays (empty when not applicable) and then calling
-# `step <id> <label> <groups> <requires> <as_home:0|1>`.
+# `step <id> <label> <groups> <requires> <as_home:0|1> [tracked:0|1]`.
+#
+# a tracked step is recorded in the lock file when install really ran it, and
+# uninstall only touches it when it is recorded there. this is what keeps
+# uninstall away from a package that was on the machine before this tool.
 
 declare -a STEP_IDS=()
 declare -A STEP_LABEL=()
@@ -32,9 +36,10 @@ declare -A STEP_GROUPS=()
 declare -A STEP_REQUIRES=()
 declare -A STEP_ASHOME=()
 declare -A STEP_DISABLED=()
+declare -A STEP_TRACKED=()
 
 step() {
-	local id="$1" label="$2" groups="$3" requires="$4" as_home="$5"
+	local id="$1" label="$2" groups="$3" requires="$4" as_home="$5" tracked="${6:-0}"
 
 	STEP_IDS+=("$id")
 	STEP_LABEL["$id"]="$label"
@@ -42,6 +47,7 @@ step() {
 	STEP_REQUIRES["$id"]="$requires"
 	STEP_ASHOME["$id"]="$as_home"
 	STEP_DISABLED["$id"]="0"
+	STEP_TRACKED["$id"]="$tracked"
 }
 
 join_comma() {
@@ -194,8 +200,10 @@ HEALTH_ripgrep=(
 	'rg --version'
 )
 UPDATE_ripgrep=()
-UNINSTALL_ripgrep=()
-step ripgrep "Ripgrep" "ripgrep" "" "0"
+UNINSTALL_ripgrep=(
+	'apt-get remove ripgrep -y'
+)
+step ripgrep "Ripgrep" "ripgrep" "" "0" "1"
 
 CMDS_xclip=(
 	'apt-get install xclip -y'
@@ -204,8 +212,10 @@ HEALTH_xclip=(
 	'xclip -version'
 )
 UPDATE_xclip=()
-UNINSTALL_xclip=()
-step xclip "XClip" "clipboard" "" "0"
+UNINSTALL_xclip=(
+	'apt-get remove xclip -y'
+)
+step xclip "XClip" "clipboard" "" "0" "1"
 
 CMDS_wlclipboard=(
 	'apt-get install wl-clipboard -y'
@@ -214,8 +224,10 @@ HEALTH_wlclipboard=(
 	'which wl-copy'
 )
 UPDATE_wlclipboard=()
-UNINSTALL_wlclipboard=()
-step wlclipboard "WL Clipboard" "clipboard" "" "0"
+UNINSTALL_wlclipboard=(
+	'apt-get remove wl-clipboard -y'
+)
+step wlclipboard "WL Clipboard" "clipboard" "" "0" "1"
 
 CMDS_git=(
 	'add-apt-repository ppa:git-core/ppa -y'
@@ -276,8 +288,10 @@ HEALTH_tmux=(
 	'which tmux'
 )
 UPDATE_tmux=()
-UNINSTALL_tmux=()
-step tmux "Tmux" "tmux" "" "0"
+UNINSTALL_tmux=(
+	'apt-get remove tmux -y'
+)
+step tmux "Tmux" "tmux" "" "0" "1"
 
 CMDS_fzf=(
 	'apt-get install fzf -y'
@@ -286,8 +300,10 @@ HEALTH_fzf=(
 	'which fzf'
 )
 UPDATE_fzf=()
-UNINSTALL_fzf=()
-step fzf "Fzf" "fzf" "" "0"
+UNINSTALL_fzf=(
+	'apt-get remove fzf -y'
+)
+step fzf "Fzf" "fzf" "" "0" "1"
 
 CMDS_jq=(
 	'apt-get install jq -y'
@@ -296,8 +312,22 @@ HEALTH_jq=(
 	'which jq'
 )
 UPDATE_jq=()
-UNINSTALL_jq=()
-step jq "Jq" "jq" "" "0"
+UNINSTALL_jq=(
+	'apt-get remove jq -y'
+)
+step jq "Jq" "jq" "" "0" "1"
+
+CMDS_btop=(
+	'apt-get install btop -y'
+)
+HEALTH_btop=(
+	'which btop'
+)
+UPDATE_btop=()
+UNINSTALL_btop=(
+	'apt-get remove btop -y'
+)
+step btop "Btop" "btop" "" "0" "1"
 
 read -r -d '' CMD_REMOVE_VIM <<'CMDEOF' || true
 pkgs=$(dpkg -l | awk '/^ii/ && $2 ~ /^(vim|neovim)([-:]|$)/ {print $2}'); [ -z "$pkgs" ] || apt-get purge -y $pkgs
@@ -619,7 +649,7 @@ UPDATE_systemtheme=()
 UNINSTALL_systemtheme=(
 	'rm -f $HOME/.config/systemd/user/graphical-session.target.wants/system-theme.service'
 )
-step systemtheme "Follow system theme" "configs" "linkconfigs" "1"
+step systemtheme "Follow system theme" "configs" "config-manager" "1"
 
 CMDS_tpm=(
 	'mkdir -p $HOME/.tmux/plugins'
@@ -1086,6 +1116,57 @@ resolve_configs_dir() {
 	has_configs "$CONFIGS_BASE_DIR"
 }
 
+# ---------------------------------------------------------------------------
+# lock file: the tracked steps this tool installed, one id per line
+# ---------------------------------------------------------------------------
+
+# next to the script, not in ~/.config-manager: that folder may not exist yet
+# during install, and creating it would make the clone step fail.
+LOCK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+LOCK_FILE="$LOCK_DIR/config-manager.lock"
+
+declare -A LOCK_ENTRIES=()
+
+# loaded once into memory: uninstall removes ~/.config-manager, and with it this
+# file, before it reaches the steps that come earlier in the pipeline.
+lock_load() {
+	local id
+	[ -f "$LOCK_FILE" ] || return 0
+	while IFS= read -r id || [ -n "$id" ]; do
+		[ -n "$id" ] && LOCK_ENTRIES["$id"]=1
+	done <"$LOCK_FILE"
+}
+
+lock_save() {
+	[ -d "$LOCK_DIR" ] || return 0
+
+	if [ "${#LOCK_ENTRIES[@]}" -eq 0 ]; then
+		rm -f "$LOCK_FILE"
+		return 0
+	fi
+
+	if ! printf '%s\n' "${!LOCK_ENTRIES[@]}" | sort >"$LOCK_FILE"; then
+		printf '%swarning: could not write %s%s\n' "$CLR_YELLOW" "$LOCK_FILE" "$CLR_RESET"
+		return 0
+	fi
+
+	chown "$SUDO_USER:" "$LOCK_FILE"
+}
+
+lock_has() {
+	[ -n "${LOCK_ENTRIES[$1]:-}" ]
+}
+
+lock_add() {
+	LOCK_ENTRIES["$1"]=1
+	lock_save
+}
+
+lock_remove() {
+	unset "LOCK_ENTRIES[$1]"
+	lock_save
+}
+
 # ===========================================================================
 # the pipeline runner
 # ===========================================================================
@@ -1122,6 +1203,8 @@ run_pipeline() {
 			exit 1
 		fi
 	fi
+
+	lock_load
 
 	local total=${#STEP_IDS[@]}
 	local -a order=()
@@ -1170,6 +1253,12 @@ run_pipeline() {
 			fi
 		fi
 
+		if [ "$mode_name" = "uninstall" ] && [ "${STEP_TRACKED[$id]}" = "1" ] && ! lock_has "$id"; then
+			printf '%s%s %s(not installed by this tool)%s: %s%s\n' "$CLR_BLUE" "$position" "$CLR_DIM" "$CLR_BLUE" "$label" "$CLR_RESET"
+			printf '  %sSkipping...%s\n' "$CLR_DIM" "$CLR_RESET"
+			continue
+		fi
+
 		printf '%s%s: %s%s\n' "$CLR_BLUE" "$position" "$label" "$CLR_RESET"
 
 		local -n health_cmds="HEALTH_${id}"
@@ -1204,7 +1293,7 @@ run_pipeline() {
 		local abort_on_failure=0
 		[ "$verify_after" = "1" ] && [ "${#health_cmds[@]}" -gt 0 ] && abort_on_failure=1
 
-		local ci cmd status
+		local ci cmd status step_failed=0
 		for ((ci = 0; ci < ${#step_cmds[@]}; ci++)); do
 			cmd="${step_cmds[$ci]}"
 			[ "$ci" -gt 0 ] && echo
@@ -1219,6 +1308,7 @@ run_pipeline() {
 			fi
 
 			printf '    %sfail: %d%s' "$CLR_RED" "$status" "$CLR_RESET"
+			step_failed=1
 
 			if [ "$abort_on_failure" = "1" ]; then
 				echo
@@ -1231,6 +1321,10 @@ run_pipeline() {
 		done
 
 		echo
+
+		if [ "$mode_name" = "uninstall" ] && [ "${STEP_TRACKED[$id]}" = "1" ] && [ "$step_failed" = "0" ]; then
+			lock_remove "$id"
+		fi
 
 		if [ "$verify_after" != "1" ]; then
 			continue
@@ -1259,6 +1353,10 @@ run_pipeline() {
 				"$mode_name" "$position" "$label" "$status" "$hc"
 			exit 1
 		done
+
+		if [ "$mode_name" = "install" ] && [ "${STEP_TRACKED[$id]}" = "1" ]; then
+			lock_add "$id"
+		fi
 	done
 
 	if [ "$ran" -eq 0 ]; then
