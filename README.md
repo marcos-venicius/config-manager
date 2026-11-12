@@ -123,7 +123,7 @@ Alacritty, tmux and Helix follow the GNOME color scheme, live, including the win
 
 | GNOME `color-scheme`        | Theme        |
 | --------------------------- | ------------ |
-| `prefer-dark`               | Kanagawa     |
+| `prefer-dark`               | Blacksite    |
 | `default` or `prefer-light` | GitHub Light |
 
 The terminal can't carry this on its own: Alacritty does not implement mode 2031, so tmux and Helix never hear about

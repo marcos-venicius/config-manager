@@ -8,7 +8,7 @@
 # theme = "catppuccin_mocha"
 # theme = "everforest_dark"
 # theme = "kanagawa"
-# github_light or kanagawa, system-theme writes it to ~/.config/helix/themes/system.toml
+# github_light or blacksite, system-theme writes it to ~/.config/helix/themes/system.toml
 theme = "system"
 
 [editor]

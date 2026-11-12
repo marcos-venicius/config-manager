@@ -1,61 +1,71 @@
 # =============================================================
-# Kanagawa - https://github.com/rebelot/kanagawa.nvim
+# Blacksite
 # =============================================================
 
 [colors.primary]
-background        = "#1F1F28"
-foreground        = "#DCD7BA"
-dim_foreground    = "#C8C093"
-bright_foreground = "#DCD7BA"
+background        = "#030504"
+foreground        = "#b4c4b9"
+dim_foreground    = "#4f6257"
+bright_foreground = "#e0ebe3"
 
 [colors.cursor]
-text   = "#1F1F28"
-cursor = "#C8C093"
+text   = "#030504"
+cursor = "#6dffaf"
 
 [colors.vi_mode_cursor]
-text   = "#1F1F28"
-cursor = "#7E9CD8"
+text   = "#030504"
+cursor = "#5cc8cf"
 
 [colors.selection]
-text       = "#C8C093"
-background = "#2D4F67"
+text       = "#e0ebe3"
+background = "#16261d"
 
 [colors.search.matches]
-foreground = "#1F1F28"
-background = "#C0A36E"
+foreground = "#030504"
+background = "#c9b06a"
 
 [colors.search.focused_match]
-foreground = "#1F1F28"
-background = "#98BB6C"
+foreground = "#030504"
+background = "#39d98a"
 
 [colors.footer_bar]
-foreground = "#C8C093"
-background = "#16161D"
+foreground = "#b4c4b9"
+background = "#0c110f"
 
 [colors.hints.start]
-foreground = "#1F1F28"
-background = "#FF9E3B"
+foreground = "#030504"
+background = "#39d98a"
 
 [colors.hints.end]
-foreground = "#C8C093"
-background = "#2A2A37"
+foreground = "#b4c4b9"
+background = "#16261d"
 
 [colors.normal]
-black   = "#090618"
-red     = "#C34043"
-green   = "#76946A"
-yellow  = "#C0A36E"
-blue    = "#7E9CD8"
-magenta = "#957FB8"
-cyan    = "#6A9589"
-white   = "#C8C093"
+black   = "#030504"
+red     = "#d2464f"
+green   = "#39d98a"
+yellow  = "#c9a24a"
+blue    = "#4a8fc7"
+magenta = "#a26fc4"
+cyan    = "#3fb8bf"
+white   = "#a9b8ae"
 
 [colors.bright]
-black   = "#727169"
-red     = "#E82424"
-green   = "#98BB6C"
-yellow  = "#E6C384"
-blue    = "#7FB4CA"
-magenta = "#938AA9"
-cyan    = "#7AA89F"
-white   = "#DCD7BA"
+black   = "#2f3d35"
+red     = "#ff6b6b"
+green   = "#6dffaf"
+yellow  = "#e6c36a"
+blue    = "#78b4e6"
+magenta = "#c79be0"
+cyan    = "#72e0e5"
+white   = "#e2ece5"
+
+[colors.dim]
+black   = "#030504"
+red     = "#8f343a"
+green   = "#278f5c"
+yellow  = "#866c33"
+blue    = "#345f83"
+magenta = "#6b4a82"
+cyan    = "#2b7a7e"
+white   = "#6f7d74"
