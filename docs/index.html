@@ -13,37 +13,45 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* catppuccin latte */
+    /* github light, same colors as configs/theme/light */
     :root {
-      --base: #eff1f5; --mantle: #e6e9ef; --crust: #dce0e8;
-      --surface0: #ccd0da; --surface1: #bcc0cc;
-      --text: #4c4f69; --subtext: #6c6f85; --overlay: #9ca0b0;
-      --blue: #1e66f5; --sky: #04a5e5; --green: #40a02b; --yellow: #df8e1d;
-      --red: #d20f39; --mauve: #8839ef; --peach: #fe640b;
-      --term-bg: #1e1e2e; --term-text: #cdd6f4; --term-dim: #7f849c;
-      --term-blue: #89b4fa; --term-sky: #89dceb; --term-green: #a6e3a1; --term-yellow: #f9e2af; --term-red: #f38ba8;
-      --shadow: 0 20px 50px -20px rgba(76, 79, 105, .35);
+      --base: #ffffff; --mantle: #f6f8fa; --crust: #eaeef2;
+      --surface0: #d0d7de; --surface1: #afb8c1;
+      --text: #1f2328; --subtext: #59636e; --overlay: #8c959f;
+      --blue: #0969da; --sky: #1b7c83; --green: #1a7f37; --yellow: #9a6700;
+      --red: #cf222e; --mauve: #8250df; --peach: #bc4c00;
+      --accent: #0969da; --accent-2: #8250df; --on-accent: #ffffff;
+      --term-bg: #ffffff; --term-text: #1f2328; --term-dim: #59636e;
+      --term-blue: #0969da; --term-sky: #1b7c83; --term-green: #1a7f37; --term-yellow: #4d2d00; --term-red: #cf222e;
+      --shadow: 0 20px 50px -20px rgba(31, 35, 40, .25);
+      color-scheme: light;
     }
-    /* catppuccin mocha */
+    /* blacksite, same colors as configs/theme/dark */
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --base: #1e1e2e; --mantle: #181825; --crust: #11111b;
-        --surface0: #313244; --surface1: #45475a;
-        --text: #cdd6f4; --subtext: #a6adc8; --overlay: #6c7086;
-        --blue: #89b4fa; --sky: #89dceb; --green: #a6e3a1; --yellow: #f9e2af;
-        --red: #f38ba8; --mauve: #cba6f7; --peach: #fab387;
-        --term-bg: #11111b;
-        --shadow: 0 20px 60px -20px rgba(0, 0, 0, .7);
+        --base: #070a09; --mantle: #0c110f; --crust: #030504;
+        --surface0: #1a2620; --surface1: #2f3d35;
+        --text: #b4c4b9; --subtext: #8aa293; --overlay: #4f6257;
+        --blue: #6f9fc4; --sky: #5cc8cf; --green: #39d98a; --yellow: #c9b06a;
+        --red: #e5535b; --mauve: #a07fc9; --peach: #d9844a;
+        --accent: #39d98a; --accent-2: #5cc8cf; --on-accent: #030504;
+        --term-bg: #030504; --term-text: #b4c4b9; --term-dim: #4f6257;
+        --term-blue: #4a8fc7; --term-sky: #3fb8bf; --term-green: #39d98a; --term-yellow: #c9a24a; --term-red: #d2464f;
+        --shadow: 0 20px 60px -20px rgba(0, 0, 0, .8);
+        color-scheme: dark;
       }
     }
     :root[data-theme="dark"] {
-      --base: #1e1e2e; --mantle: #181825; --crust: #11111b;
-      --surface0: #313244; --surface1: #45475a;
-      --text: #cdd6f4; --subtext: #a6adc8; --overlay: #6c7086;
-      --blue: #89b4fa; --sky: #89dceb; --green: #a6e3a1; --yellow: #f9e2af;
-      --red: #f38ba8; --mauve: #cba6f7; --peach: #fab387;
-      --term-bg: #11111b;
-      --shadow: 0 20px 60px -20px rgba(0, 0, 0, .7);
+      --base: #070a09; --mantle: #0c110f; --crust: #030504;
+      --surface0: #1a2620; --surface1: #2f3d35;
+      --text: #b4c4b9; --subtext: #8aa293; --overlay: #4f6257;
+      --blue: #6f9fc4; --sky: #5cc8cf; --green: #39d98a; --yellow: #c9b06a;
+      --red: #e5535b; --mauve: #a07fc9; --peach: #d9844a;
+      --accent: #39d98a; --accent-2: #5cc8cf; --on-accent: #030504;
+      --term-bg: #030504; --term-text: #b4c4b9; --term-dim: #4f6257;
+      --term-blue: #4a8fc7; --term-sky: #3fb8bf; --term-green: #39d98a; --term-yellow: #c9a24a; --term-red: #d2464f;
+      --shadow: 0 20px 60px -20px rgba(0, 0, 0, .8);
+      color-scheme: dark;
     }
 
     * { box-sizing: border-box; }
@@ -66,7 +74,7 @@
     nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--base) 85%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--surface0); }
     nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
     .brand { font-family: "JetBrains Mono", monospace; font-weight: 600; color: var(--text); }
-    .brand span { color: var(--mauve); }
+    .brand span { color: var(--accent); }
     nav ul { list-style: none; display: flex; gap: 22px; margin: 0; padding: 0; align-items: center; }
     nav ul a { color: var(--subtext); font-size: .93rem; }
     nav ul a:hover { color: var(--text); text-decoration: none; }
@@ -76,9 +84,9 @@
     /* hero */
     .hero { padding: 72px 0 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
     @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); padding-top: 44px; gap: 36px; } }
-    .eyebrow { display: inline-block; font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--mauve); background: color-mix(in srgb, var(--mauve) 12%, transparent); padding: 4px 10px; border-radius: 99px; }
+    .eyebrow { display: inline-block; font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 4px 10px; border-radius: 99px; }
     h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.08; letter-spacing: -.03em; margin: 18px 0 16px; font-weight: 800; }
-    h1 em { font-style: normal; background: linear-gradient(90deg, var(--blue), var(--mauve)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    h1 em { font-style: normal; background: linear-gradient(90deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
     .lead { font-size: 1.15rem; color: var(--subtext); margin: 0 0 28px; max-width: 34em; }
 
     .install { display: flex; align-items: stretch; background: var(--mantle); border: 1px solid var(--surface0); border-radius: 12px; overflow: hidden; max-width: 100%; }
@@ -89,15 +97,15 @@
     .cta { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
     .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 10px; font-weight: 600; font-size: .95rem; }
     .btn:hover { text-decoration: none; filter: brightness(1.08); }
-    .btn.primary { background: var(--blue); color: var(--crust); }
+    .btn.primary { background: var(--accent); color: var(--on-accent); }
     .btn.ghost { border: 1px solid var(--surface1); color: var(--text); }
 
     /* terminal */
     .term { background: var(--term-bg); border-radius: 14px; box-shadow: var(--shadow); border: 1px solid color-mix(in srgb, var(--surface1) 60%, transparent); overflow: hidden; min-width: 0; }
-    .term-bar { display: flex; align-items: center; gap: 7px; padding: 12px 14px; background: color-mix(in srgb, var(--term-bg) 80%, #45475a); }
-    .term-bar i { flex: none; width: 11px; height: 11px; border-radius: 50%; background: #f38ba8; }
-    .term-bar i:nth-child(2) { background: #f9e2af; }
-    .term-bar i:nth-child(3) { background: #a6e3a1; }
+    .term-bar { display: flex; align-items: center; gap: 7px; padding: 12px 14px; background: color-mix(in srgb, var(--term-bg) 85%, var(--surface1)); border-bottom: 1px solid var(--surface0); }
+    .term-bar i { flex: none; width: 11px; height: 11px; border-radius: 50%; background: var(--red); }
+    .term-bar i:nth-child(2) { background: var(--yellow); }
+    .term-bar i:nth-child(3) { background: var(--green); }
     .term-bar span { margin-left: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; color: var(--term-dim); font: .78rem "JetBrains Mono", monospace; }
     .term-body { height: 390px; overflow: hidden; padding: 16px 18px; color: var(--term-text); font: .8rem/1.55 "JetBrains Mono", monospace; white-space: pre-wrap; word-break: break-word; }
     .t-blue { color: var(--term-blue); } .t-sky { color: var(--term-sky); } .t-green { color: var(--term-green); font-weight: 600; }
@@ -122,7 +130,7 @@
     .group { border: 1px solid var(--surface0); border-radius: 12px; padding: 16px 18px; background: var(--base); }
     .group header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 6px; }
     .group strong { font-size: .98rem; }
-    .tag { font: .72rem "JetBrains Mono", monospace; color: var(--mauve); background: color-mix(in srgb, var(--mauve) 12%, transparent); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+    .tag { font: .72rem "JetBrains Mono", monospace; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
     .group p { margin: 0; color: var(--subtext); font-size: .9rem; }
 
     .ignore-demo { margin-top: 28px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; color: var(--subtext); font-size: .95rem; }
@@ -131,7 +139,7 @@
     /* steps */
     .steps { counter-reset: step; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
     .step { position: relative; padding: 22px 22px 22px 70px; border-radius: 14px; background: var(--mantle); border: 1px solid var(--surface0); }
-    .step::before { counter-increment: step; content: counter(step, decimal-leading-zero); position: absolute; left: 20px; top: 20px; font: 600 1.1rem "JetBrains Mono", monospace; color: var(--blue); }
+    .step::before { counter-increment: step; content: counter(step, decimal-leading-zero); position: absolute; left: 20px; top: 20px; font: 600 1.1rem "JetBrains Mono", monospace; color: var(--accent); }
     .step h3 { margin: 0 0 6px; font-size: 1.02rem; }
     .step p { margin: 0; color: var(--subtext); font-size: .93rem; }
     .step pre { margin: 10px 0 0; font-size: .78rem; background: var(--base); border: 1px solid var(--surface0); border-radius: 8px; padding: 8px 10px; overflow-x: auto; }
@@ -151,7 +159,7 @@
     .bullets { margin: 16px 0 0; padding-left: 18px; color: var(--subtext); font-size: .89rem; }
     .bullets li { margin: 5px 0; }
     .bullets code, .bind code { font-size: .84em; }
-    .prompt-demo { margin: 0 0 14px; background: var(--term-bg); border-radius: 10px; padding: 12px 14px; font: .8rem/1.6 "JetBrains Mono", monospace; color: var(--term-text); white-space: pre-wrap; word-break: break-word; }
+    .prompt-demo { margin: 0 0 14px; background: var(--term-bg); border: 1px solid var(--surface0); border-radius: 10px; padding: 12px 14px; font: .8rem/1.6 "JetBrains Mono", monospace; color: var(--term-text); white-space: pre-wrap; word-break: break-word; }
     .prompt-demo .t-dim { color: var(--term-dim); }
 
     .note { margin-top: 36px; border-left: 3px solid var(--yellow); background: color-mix(in srgb, var(--yellow) 10%, transparent); padding: 14px 18px; border-radius: 0 10px 10px 0; color: var(--text); font-size: .95rem; }
@@ -423,20 +431,32 @@ step tmuxer "Download &amp; Build Tmuxer" "tmuxer" "nim git" "1"</pre>
   </footer>
 
   <script>
-    // theme toggle (per-viewer convenience)
+    // follows the system theme, live. The toggle overrides it only until the
+    // system mode changes, like :theme in Helix.
     (function () {
       var root = document.documentElement;
+      var system = matchMedia("(prefers-color-scheme: dark)");
+      var mode = function () { return system.matches ? "dark" : "light"; };
       try {
-        var saved = localStorage.getItem("theme");
-        if (saved) root.setAttribute("data-theme", saved);
+        // the override is saved with the system mode it was made in, and dropped once that mode changes
+        var saved = JSON.parse(localStorage.getItem("theme") || "null");
+        if (saved && saved.system === mode()) root.setAttribute("data-theme", saved.theme);
+        else localStorage.removeItem("theme");
       } catch (e) {}
+      system.addEventListener("change", function () {
+        root.removeAttribute("data-theme");
+        try { localStorage.removeItem("theme"); } catch (e) {}
+      });
       document.getElementById("theme").addEventListener("click", function () {
-        var dark = root.getAttribute("data-theme")
-          ? root.getAttribute("data-theme") === "dark"
-          : matchMedia("(prefers-color-scheme: dark)").matches;
-        var next = dark ? "light" : "dark";
-        root.setAttribute("data-theme", next);
-        try { localStorage.setItem("theme", next); } catch (e) {}
+        var current = root.getAttribute("data-theme") || mode();
+        var next = current === "dark" ? "light" : "dark";
+        if (next === mode()) {
+          root.removeAttribute("data-theme");
+          try { localStorage.removeItem("theme"); } catch (e) {}
+        } else {
+          root.setAttribute("data-theme", next);
+          try { localStorage.setItem("theme", JSON.stringify({ theme: next, system: mode() })); } catch (e) {}
+        }
       });
     })();
 
