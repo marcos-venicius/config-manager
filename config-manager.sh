@@ -170,16 +170,16 @@ UNINSTALL_docker=(
 step docker "Install Docker" "docker" "base" "0"
 
 CMDS_font=(
-	'wget -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip'
-	'cd ~/.local/share/fonts && unzip JetBrainsMono.zip && rm JetBrainsMono.zip'
+	'wget -P ~/.local/share/fonts https://github.com/ryanoasis/nerd-fonts/releases/latest/download/AtkinsonHyperlegibleMono.zip'
+	'cd ~/.local/share/fonts && unzip -o AtkinsonHyperlegibleMono.zip && rm AtkinsonHyperlegibleMono.zip'
 	'fc-cache -f -v'
 )
 HEALTH_font=(
-	'ls -lah ~/.local/share/fonts/ | grep "JetBrainsMono*"'
+	'ls -lah ~/.local/share/fonts/ | grep "AtkynsonMono"'
 )
 UPDATE_font=()
 UNINSTALL_font=(
-	'rm -rf ~/.local/share/fonts/JetBrainsMono*'
+	'rm -rf ~/.local/share/fonts/AtkynsonMono*'
 )
 step font "Font" "font" "" "1"
 

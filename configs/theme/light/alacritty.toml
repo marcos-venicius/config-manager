@@ -1,61 +1,71 @@
 # =============================================================
-# GitHub Light - https://github.com/projekt0n/github-nvim-theme
+# Sereno Light - helix runtime/themes/sereno_light.toml (marcos-venicius/helix)
 # =============================================================
 
 [colors.primary]
-background        = "#FFFFFF"
-foreground        = "#1F2328"
-dim_foreground    = "#59636E"
-bright_foreground = "#1F2328"
+background        = "#f6f4f0"
+foreground        = "#25292f"
+dim_foreground    = "#66635a"
+bright_foreground = "#0e1217"
 
 [colors.cursor]
-text   = "#FFFFFF"
-cursor = "#0969DA"
+text   = "#f6f4f0"
+cursor = "#25292f"
 
 [colors.vi_mode_cursor]
-text   = "#FFFFFF"
-cursor = "#8250DF"
+text   = "#f6f4f0"
+cursor = "#652a72"
 
 [colors.selection]
-text       = "#1F2328"
-background = "#B6E3FF"
+text       = "CellForeground"
+background = "#b9d4f1"
 
 [colors.search.matches]
-foreground = "#1F2328"
-background = "#FAE17D"
+foreground = "#0e1217"
+background = "#d5c29c"
 
 [colors.search.focused_match]
-foreground = "#FFFFFF"
-background = "#1A7F37"
+foreground = "#f6f4f0"
+background = "#184687"
 
 [colors.footer_bar]
-foreground = "#1F2328"
-background = "#EAEEF2"
+foreground = "#25292f"
+background = "#ebe9e4"
 
 [colors.hints.start]
-foreground = "#1F2328"
-background = "#FAE17D"
+foreground = "#f6f4f0"
+background = "#652a72"
 
 [colors.hints.end]
-foreground = "#1F2328"
-background = "#EAEEF2"
+foreground = "#25292f"
+background = "#ccdff3"
 
 [colors.normal]
-black   = "#24292F"
-red     = "#CF222E"
-green   = "#116329"
-yellow  = "#4D2D00"
-blue    = "#0969DA"
-magenta = "#8250DF"
-cyan    = "#1B7C83"
-white   = "#6E7781"
+black   = "#25292f"
+red     = "#90302e"
+green   = "#1f6619"
+yellow  = "#734c02"
+blue    = "#17559b"
+magenta = "#743981"
+cyan    = "#026266"
+white   = "#66635a"
 
 [colors.bright]
-black   = "#57606A"
-red     = "#A40E26"
-green   = "#1A7F37"
-yellow  = "#633C01"
-blue    = "#218BFF"
-magenta = "#A475F9"
-cyan    = "#3192AA"
-white   = "#8C959F"
+black   = "#66635a"
+red     = "#761619"
+green   = "#054f00"
+yellow  = "#573900"
+blue    = "#003e7e"
+magenta = "#5c2169"
+cyan    = "#02494d"
+white   = "#88867e"
+
+[colors.dim]
+black   = "#6e7073"
+red     = "#b47572"
+green   = "#6a9864"
+yellow  = "#a18755"
+blue    = "#658db9"
+magenta = "#a27aa8"
+cyan    = "#579596"
+white   = "#98968e"

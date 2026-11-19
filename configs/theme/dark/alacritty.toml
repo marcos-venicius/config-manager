@@ -1,71 +1,71 @@
 # =============================================================
-# Blacksite
+# Sereno Dark - helix runtime/themes/sereno_dark.toml (marcos-venicius/helix)
 # =============================================================
 
 [colors.primary]
-background        = "#030504"
-foreground        = "#b4c4b9"
-dim_foreground    = "#4f6257"
-bright_foreground = "#e0ebe3"
+background        = "#171a1d"
+foreground        = "#dad7cf"
+dim_foreground    = "#81878d"
+bright_foreground = "#eae8e0"
 
 [colors.cursor]
-text   = "#030504"
-cursor = "#6dffaf"
+text   = "#171a1d"
+cursor = "#dad7cf"
 
 [colors.vi_mode_cursor]
-text   = "#030504"
-cursor = "#5cc8cf"
+text   = "#171a1d"
+cursor = "#e2b5ec"
 
 [colors.selection]
-text       = "#e0ebe3"
-background = "#16261d"
+text       = "CellForeground"
+background = "#2b415c"
 
 [colors.search.matches]
-foreground = "#030504"
-background = "#c9b06a"
+foreground = "#eae8e0"
+background = "#5f5033"
 
 [colors.search.focused_match]
-foreground = "#030504"
-background = "#39d98a"
+foreground = "#171a1d"
+background = "#9fcbfe"
 
 [colors.footer_bar]
-foreground = "#b4c4b9"
-background = "#0c110f"
+foreground = "#dad7cf"
+background = "#1d2125"
 
 [colors.hints.start]
-foreground = "#030504"
-background = "#39d98a"
+foreground = "#171a1d"
+background = "#e2b5ec"
 
 [colors.hints.end]
-foreground = "#b4c4b9"
-background = "#16261d"
+foreground = "#dad7cf"
+background = "#27364a"
 
 [colors.normal]
-black   = "#030504"
-red     = "#d2464f"
-green   = "#39d98a"
-yellow  = "#c9a24a"
-blue    = "#4a8fc7"
-magenta = "#a26fc4"
-cyan    = "#3fb8bf"
-white   = "#a9b8ae"
+black   = "#1d2125"
+red     = "#f4928a"
+green   = "#84c47d"
+yellow  = "#dda552"
+blue    = "#7cb4fc"
+magenta = "#d398e0"
+cyan    = "#30c8cf"
+white   = "#dad7cf"
 
 [colors.bright]
-black   = "#2f3d35"
-red     = "#ff6b6b"
-green   = "#6dffaf"
-yellow  = "#e6c36a"
-blue    = "#78b4e6"
-magenta = "#c79be0"
-cyan    = "#72e0e5"
-white   = "#e2ece5"
+black   = "#81878d"
+red     = "#febab4"
+green   = "#a8dfa2"
+yellow  = "#f4c582"
+blue    = "#aed1fe"
+magenta = "#ebb9f7"
+cyan    = "#76e2e7"
+white   = "#eae8e0"
 
 [colors.dim]
-black   = "#030504"
-red     = "#8f343a"
-green   = "#278f5c"
-yellow  = "#866c33"
-blue    = "#345f83"
-magenta = "#6b4a82"
-cyan    = "#2b7a7e"
-white   = "#6f7d74"
+black   = "#1b1f22"
+red     = "#a76864"
+green   = "#5e885b"
+yellow  = "#98743f"
+blue    = "#597eae"
+magenta = "#916c9c"
+cyan    = "#278b91"
+white   = "#969591"

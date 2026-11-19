@@ -13,44 +13,44 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    /* github light, same colors as configs/theme/light */
+    /* sereno light, same colors as configs/theme/light */
     :root {
-      --base: #ffffff; --mantle: #f6f8fa; --crust: #eaeef2;
-      --surface0: #d0d7de; --surface1: #afb8c1;
-      --text: #1f2328; --subtext: #59636e; --overlay: #8c959f;
-      --blue: #0969da; --sky: #1b7c83; --green: #1a7f37; --yellow: #9a6700;
-      --red: #cf222e; --mauve: #8250df; --peach: #bc4c00;
-      --accent: #0969da; --accent-2: #8250df; --on-accent: #ffffff;
-      --term-bg: #ffffff; --term-text: #1f2328; --term-dim: #59636e;
-      --term-blue: #0969da; --term-sky: #1b7c83; --term-green: #1a7f37; --term-yellow: #4d2d00; --term-red: #cf222e;
-      --shadow: 0 20px 50px -20px rgba(31, 35, 40, .25);
+      --base: #f6f4f0; --mantle: #ebe9e4; --crust: #e2e0da;
+      --surface0: #d6d4cd; --surface1: #b5b3ab;
+      --text: #25292f; --subtext: #66635a; --overlay: #6e7073;
+      --blue: #215da5; --sky: #025559; --green: #265721; --yellow: #986600;
+      --red: #b02a2d; --mauve: #652a72; --peach: #743610;
+      --accent: #184687; --accent-2: #652a72; --on-accent: #f6f4f0;
+      --term-bg: #f6f4f0; --term-text: #25292f; --term-dim: #66635a;
+      --term-blue: #17559b; --term-sky: #026266; --term-green: #1f6619; --term-yellow: #734c02; --term-red: #90302e;
+      --shadow: 0 20px 50px -20px rgba(37, 41, 47, .25);
       color-scheme: light;
     }
-    /* blacksite, same colors as configs/theme/dark */
+    /* sereno dark, same colors as configs/theme/dark */
     @media (prefers-color-scheme: dark) {
       :root:not([data-theme="light"]) {
-        --base: #070a09; --mantle: #0c110f; --crust: #030504;
-        --surface0: #1a2620; --surface1: #2f3d35;
-        --text: #b4c4b9; --subtext: #8aa293; --overlay: #4f6257;
-        --blue: #6f9fc4; --sky: #5cc8cf; --green: #39d98a; --yellow: #c9b06a;
-        --red: #e5535b; --mauve: #a07fc9; --peach: #d9844a;
-        --accent: #39d98a; --accent-2: #5cc8cf; --on-accent: #030504;
-        --term-bg: #030504; --term-text: #b4c4b9; --term-dim: #4f6257;
-        --term-blue: #4a8fc7; --term-sky: #3fb8bf; --term-green: #39d98a; --term-yellow: #c9a24a; --term-red: #d2464f;
-        --shadow: 0 20px 60px -20px rgba(0, 0, 0, .8);
+        --base: #171a1d; --mantle: #1d2125; --crust: #121417;
+        --surface0: #2c3136; --surface1: #41474e;
+        --text: #dad7cf; --subtext: #969591; --overlay: #81878d;
+        --blue: #73b0ee; --sky: #93d9d9; --green: #acd9a2; --yellow: #e6b55d;
+        --red: #ed756e; --mauve: #e2b5ec; --peach: #f5bd94;
+        --accent: #9fcbfe; --accent-2: #e2b5ec; --on-accent: #171a1d;
+        --term-bg: #171a1d; --term-text: #dad7cf; --term-dim: #81878d;
+        --term-blue: #7cb4fc; --term-sky: #30c8cf; --term-green: #84c47d; --term-yellow: #dda552; --term-red: #f4928a;
+        --shadow: 0 20px 60px -20px rgba(0, 0, 0, .7);
         color-scheme: dark;
       }
     }
     :root[data-theme="dark"] {
-      --base: #070a09; --mantle: #0c110f; --crust: #030504;
-      --surface0: #1a2620; --surface1: #2f3d35;
-      --text: #b4c4b9; --subtext: #8aa293; --overlay: #4f6257;
-      --blue: #6f9fc4; --sky: #5cc8cf; --green: #39d98a; --yellow: #c9b06a;
-      --red: #e5535b; --mauve: #a07fc9; --peach: #d9844a;
-      --accent: #39d98a; --accent-2: #5cc8cf; --on-accent: #030504;
-      --term-bg: #030504; --term-text: #b4c4b9; --term-dim: #4f6257;
-      --term-blue: #4a8fc7; --term-sky: #3fb8bf; --term-green: #39d98a; --term-yellow: #c9a24a; --term-red: #d2464f;
-      --shadow: 0 20px 60px -20px rgba(0, 0, 0, .8);
+      --base: #171a1d; --mantle: #1d2125; --crust: #121417;
+      --surface0: #2c3136; --surface1: #41474e;
+      --text: #dad7cf; --subtext: #969591; --overlay: #81878d;
+      --blue: #73b0ee; --sky: #93d9d9; --green: #acd9a2; --yellow: #e6b55d;
+      --red: #ed756e; --mauve: #e2b5ec; --peach: #f5bd94;
+      --accent: #9fcbfe; --accent-2: #e2b5ec; --on-accent: #171a1d;
+      --term-bg: #171a1d; --term-text: #dad7cf; --term-dim: #81878d;
+      --term-blue: #7cb4fc; --term-sky: #30c8cf; --term-green: #84c47d; --term-yellow: #dda552; --term-red: #f4928a;
+      --shadow: 0 20px 60px -20px rgba(0, 0, 0, .7);
       color-scheme: dark;
     }
 
@@ -332,7 +332,7 @@
 
         <div class="config">
           <header><h3>Alacritty</h3><span class="path">configs/alacritty/alacritty.toml</span></header>
-          <p>JetBrainsMono Nerd Font at size 9, the system theme, and nothing else in the way.</p>
+          <p>AtkynsonMono Nerd Font at size 11.5, the system theme, and nothing else in the way.</p>
           <div class="binds">
             <div class="bind"><span><kbd>Shift+Enter</kbd></span><em>Sends <code>ESC CR</code>, so a REPL or an editor can tell it apart from a plain <kbd>Enter</kbd></em></div>
           </div>
@@ -346,7 +346,7 @@
 
         <div class="config">
           <header><h3>System theme</h3><span class="path">configs/theme</span></header>
-          <p>Alacritty, tmux and Helix follow the GNOME color scheme live, including whatever is already open: GitHub Light in light mode, Blacksite in dark mode.</p>
+          <p>Alacritty, tmux and Helix follow the GNOME color scheme live, including whatever is already open: Sereno Light in light mode, Sereno Dark in dark mode.</p>
           <div class="binds">
             <div class="bind"><span><kbd>system-theme apply</kbd></span><em>Apply the current mode once, after editing a theme</em></div>
           </div>

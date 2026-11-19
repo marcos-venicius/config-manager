@@ -119,12 +119,12 @@ which is sourced by `.bashrc` and is **not** versioned.
 
 ## System theme
 
-Alacritty, tmux and Helix follow the GNOME color scheme, live, including the windows and sessions already open:
+Alacritty, tmux, Helix and Claude Code follow the GNOME color scheme, live, including the windows and sessions already open:
 
 | GNOME `color-scheme`        | Theme        |
 | --------------------------- | ------------ |
-| `prefer-dark`               | Blacksite    |
-| `default` or `prefer-light` | GitHub Light |
+| `prefer-dark`               | Sereno Dark  |
+| `default` or `prefer-light` | Sereno Light |
 
 The terminal can't carry this on its own: Alacritty does not implement mode 2031, so tmux and Helix never hear about
 a change from it. Instead, the `system-theme` user service watches the GNOME setting and, on every change:
@@ -134,6 +134,7 @@ a change from it. Instead, the `system-theme` user service watches the GNOME set
 | Alacritty | `~/.local/state/system-theme/alacritty.toml` | Its own config watcher, through `general.import` |
 | tmux      | `~/.local/state/system-theme/tmux.conf`      | `source-file` on every running tmux server       |
 | Helix     | `~/.config/helix/themes/system.toml`         | `SIGUSR1` to every running `hx`                  |
+| Claude Code | `~/.claude/themes/system.json`             | Its own watcher on the themes folder             |
 
 The active files are generated and live outside the repository, so switching themes never dirties it. The versioned
 sources are in [configs/theme](./configs/theme), one folder per mode (`light/` and `dark/`). To change a theme, edit
@@ -152,6 +153,7 @@ systemctl --user start system-theme.service
 
 - Only GNOME is supported. Without a readable `color-scheme`, the tools stay on the light theme.
 - `:theme` in Helix lasts until the next system change.
+- Claude Code only uses it with `"theme": "custom:system"` in `~/.claude/settings.json`, which is not versioned. Picking another theme in `/theme` turns it off.
 - `uninstall` stops the service from starting at login. It doesn't stop a running one or delete the generated files.
 
 ## Testing during development

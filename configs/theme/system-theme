@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Keeps alacritty, tmux and helix on the GNOME color scheme.
+# Keeps alacritty, tmux, helix and Claude Code on the GNOME color scheme.
 #
 #   system-theme watch   apply now, then follow every change (the systemd service)
 #   system-theme apply   apply once
@@ -13,6 +13,8 @@ themes="$(dirname "$(readlink -f "$0")")"
 # alacritty.toml and .tmux.conf name these paths literally, keep them in sync
 state="$HOME/.local/state/system-theme"
 helix="$HOME/.config/helix/themes"
+# settings.json names this theme as "custom:system"
+claude="$HOME/.claude/themes"
 
 current_mode() {
 	# "default" and "prefer-light" are both light
@@ -51,10 +53,11 @@ reload_helix() {
 apply() {
 	local mode
 	mode="$(current_mode)"
-	mkdir -p "$state" "$helix"
+	mkdir -p "$state" "$helix" "$claude"
 	install_file "$themes/$mode/alacritty.toml" "$state/alacritty.toml"
 	install_file "$themes/$mode/tmux.conf" "$state/tmux.conf"
 	install_file "$themes/$mode/helix.toml" "$helix/system.toml"
+	install_file "$themes/$mode/claude.json" "$claude/system.json"
 	reload_tmux
 	reload_helix
 }

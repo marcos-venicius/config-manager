@@ -1,5 +1,5 @@
 [Unit]
-Description=Keep alacritty, tmux and helix on the GNOME color scheme
+Description=Keep alacritty, tmux, helix and Claude Code on the GNOME color scheme
 PartOf=graphical-session.target
 After=graphical-session.target
 
