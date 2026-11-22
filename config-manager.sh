@@ -876,6 +876,19 @@ UPDATE_desktopterminal=()
 UNINSTALL_desktopterminal=()
 step desktopterminal "GNOME default terminal" "desktop alacritty" "" "1"
 
+# adds caps:swapescape to the xkb options, keeping whatever options are already there
+read -r -d '' DESKTOP_SWAP_ESCAPE <<'CMDEOF' || true
+k=org.gnome.desktop.input-sources; cur=$(gsettings get $k xkb-options) || exit 1; case "$cur" in *"'caps:swapescape'"*) ;; "@as []"|"[]") gsettings set $k xkb-options "['caps:swapescape']" ;; *) gsettings set $k xkb-options "${cur%]}, 'caps:swapescape']" ;; esac
+CMDEOF
+
+CMDS_desktopkeyboard=(
+	"export ${GNOME_SESSION}; $DESKTOP_SWAP_ESCAPE"
+)
+HEALTH_desktopkeyboard=()
+UPDATE_desktopkeyboard=()
+UNINSTALL_desktopkeyboard=()
+step desktopkeyboard "GNOME swap Esc and Caps Lock" "desktop" "" "1"
+
 # ===========================================================================
 # group dependency engine (mirrors the old lang/commands engine, in bash)
 # ===========================================================================
