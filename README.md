@@ -37,7 +37,7 @@ health checks them. A step that is not installed yet is skipped — that is `ins
 `cargo uninstall alacritty`. It runs the pipeline backwards and is best effort, so a command with
 nothing left to remove does not stop it.
 
-The standalone apt tools (`ripgrep`, `xclip`, `wl-clipboard`, `tmux`, `fzf`, `jq`, `btop`) are removed only if
+The standalone apt tools (`ripgrep`, `xclip`, `wl-clipboard`, `tmux`, `fzf`, `jq`, `btop`, `lazygit`) are removed only if
 this tool installed them. `install` records each one it really ran in `config-manager.lock`, next to the script
 and ignored by git, so a package that was already on the machine stays. Uninstall one that is not recorded and
 the step is skipped.

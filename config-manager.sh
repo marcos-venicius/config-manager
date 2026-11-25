@@ -339,6 +339,18 @@ UNINSTALL_btop=(
 )
 step btop "Btop" "btop" "" "0" "1"
 
+CMDS_lazygit=(
+	'apt-get install lazygit -y'
+)
+HEALTH_lazygit=(
+	'which lazygit'
+)
+UPDATE_lazygit=()
+UNINSTALL_lazygit=(
+	'apt-get remove lazygit -y'
+)
+step lazygit "Lazygit" "lazygit" "" "0" "1"
+
 read -r -d '' CMD_REMOVE_VIM <<'CMDEOF' || true
 pkgs=$(dpkg -l | awk '/^ii/ && $2 ~ /^(vim|neovim)([-:]|$)/ {print $2}'); [ -z "$pkgs" ] || apt-get purge -y $pkgs
 CMDEOF
